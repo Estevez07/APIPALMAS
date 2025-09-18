@@ -52,7 +52,7 @@ public class Mensaje {
     private Archivo archivo;
 
     // Opcional: mensaje que representa un pedido
-    @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @OneToOne
+    @JoinColumn(name = "pedido_id", unique = true)
     private Pedido pedido;
 }

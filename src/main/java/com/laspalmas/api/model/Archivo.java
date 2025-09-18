@@ -47,7 +47,7 @@ public class Archivo {
     @Size(max = 10485760, message = "El archivo no puede superar los 10MB") // 10MB aprox
     private byte[] contenido;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "pedido_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "pedido_id")
     private Pedido pedido;
 }
