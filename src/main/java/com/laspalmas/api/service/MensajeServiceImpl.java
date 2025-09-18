@@ -1,6 +1,7 @@
 package com.laspalmas.api.service;
 
-import java.util.Date;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,8 +15,6 @@ import com.laspalmas.api.repository.UsuarioRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import com.laspalmas.api.model.Archivo;
-import com.laspalmas.api.model.ArchivoDTO;
 import com.laspalmas.api.model.Mensaje;
 import com.laspalmas.api.model.MensajeDTO;
 import com.laspalmas.api.model.Pedido;
@@ -43,12 +42,12 @@ public class MensajeServiceImpl implements MensajeService{
     @Override
        public MensajeDTO enviarMensaje(String Cotenido, List<MultipartFile> archivos,
                                 Long idDestinatario,
-                                Long idRemitente,
-                                Long idPedido){
+                                String numeroCelular,
+                                Long idPedido) throws IOException{
        Mensaje mensaje = new Mensaje();
         mensaje.setContenido(Cotenido);
         // Set remitente y destinatario obligatorios
-        Usuario remitente = usuarioRepository.findById(idRemitente)
+        Usuario remitente = usuarioRepository.findByNumeroCelular(numeroCelular)
                 .orElseThrow(() -> new RuntimeException("Remitente no encontrado"));
         Usuario destinatario = usuarioRepository.findById(idDestinatario)
                 .orElseThrow(() -> new RuntimeException("Destinatario no encontrado"));
@@ -80,10 +79,10 @@ public class MensajeServiceImpl implements MensajeService{
 
 
     @Override
-     public List<MensajeDTO> obtenerMensajesEntreUsuarios(Long remitenteId, Long destinatarioId) {
-        Usuario remitente = usuarioRepository.findById(remitenteId)
+     public List<MensajeDTO> obtenerMensajesEntreUsuarios(String numeroCelular, Long idDestinatario) {
+        Usuario remitente = usuarioRepository.findByNumeroCelular(numeroCelular)
                 .orElseThrow(() -> new RuntimeException("Remitente no encontrado"));
-        Usuario destinatario = usuarioRepository.findById(destinatarioId)
+        Usuario destinatario = usuarioRepository.findById(idDestinatario)
                 .orElseThrow(() -> new RuntimeException("Destinatario no encontrado"));
 
         return mensajeRepository.findByRemitenteAndDestinatario(remitente, destinatario)

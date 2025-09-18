@@ -1,6 +1,7 @@
 package com.laspalmas.api.service;
 
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -11,8 +12,8 @@ public interface MensajeService {
 
      MensajeDTO enviarMensaje(String Cotenido, List<MultipartFile> archivo,
                                 Long idDestinatario,
-                                Long idRemitente,
-                                Long idPedido);
+                                String numeroCelular,
+                                Long idPedido) throws IOException;
 
-     List<MensajeDTO> obtenerMensajesEntreUsuarios(Long remitenteId, Long destinatarioId);
+     List<MensajeDTO> obtenerMensajesEntreUsuarios(String numeroCelular, Long idDestinatario);
 }
