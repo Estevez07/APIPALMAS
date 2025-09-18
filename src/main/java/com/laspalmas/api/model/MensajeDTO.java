@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -14,12 +15,10 @@ public class MensajeDTO {
     private Date fechaEnvio;
     private String estado;
 
-    private Long remitenteId;
-    private String remitenteNombre;
+    private UsuarioDTO remitente;      
+    private UsuarioDTO destinatario;    
 
-    private Long destinatarioId;
-    private String destinatarioNombre;
-
-    private Long archivoId; // opcional
-    private Long pedidoId;  // opcional
+    private List<ArchivoDTO> archivos;         // opcional
+    private PedidoDTO pedido;           // opcional
+ 
 }

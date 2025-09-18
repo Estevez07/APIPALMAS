@@ -1,6 +1,7 @@
 package com.laspalmas.api.model;
 
 import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -49,7 +50,7 @@ public class Mensaje {
     // Opcional: mensaje con archivo adjunto
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "archivo_id")
-    private Archivo archivo;
+    List<Archivo> archivos;
 
     // Opcional: mensaje que representa un pedido
     @OneToOne
