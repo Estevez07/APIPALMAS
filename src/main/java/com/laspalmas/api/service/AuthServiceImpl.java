@@ -1,13 +1,16 @@
 package com.laspalmas.api.service;
 
+import com.laspalmas.api.model.Rol;
 import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,19 +18,17 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final AuthenticationManager authenticationManager;
+
+    private final JwtUtil jwtUtil;
 
     @Override
     public String registrar(Usuario usuario) {
@@ -36,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
-        usuario.setRol("USER");
+        usuario.setRol(Rol.USER);
         usuarioRepository.save(usuario);
         return "Usuario registrado correctamente";
     }

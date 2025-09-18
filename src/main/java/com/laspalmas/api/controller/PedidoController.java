@@ -2,7 +2,9 @@ package com.laspalmas.api.controller;
 
 import com.laspalmas.api.model.PedidoDTO;
 import com.laspalmas.api.service.PedidoService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -13,11 +15,12 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/pedidos")
 public class PedidoController {
 
-    @Autowired
-    private PedidoService pedidoService;
+ 
+    private final PedidoService pedidoService;
 
     //  Solo ADMIN
     @GetMapping

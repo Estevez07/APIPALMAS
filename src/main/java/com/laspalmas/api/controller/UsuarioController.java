@@ -3,17 +3,20 @@ package com.laspalmas.api.controller;
 
 import com.laspalmas.api.model.UsuarioDTO;
 import com.laspalmas.api.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+ 
+    private final UsuarioService usuarioService;
 
     @GetMapping("/con-pedidos")
     public List<UsuarioDTO> obtenerUsuariosConPedidos() {
