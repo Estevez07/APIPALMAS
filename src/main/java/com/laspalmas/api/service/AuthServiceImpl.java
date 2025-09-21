@@ -1,7 +1,7 @@
 package com.laspalmas.api.service;
 
-import com.laspalmas.api.model.Rol;
 import com.laspalmas.api.model.Usuario;
+import com.laspalmas.api.model.enu.Rol;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
 
