@@ -1,9 +1,10 @@
-package com.laspalmas.api.service;
+package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.mapper.UsuarioMapper;
 
 import com.laspalmas.api.repository.UsuarioRepository;
+import com.laspalmas.api.service.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
 

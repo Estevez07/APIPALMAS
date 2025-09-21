@@ -2,7 +2,8 @@ package com.laspalmas.api.config;
 
 
 import com.laspalmas.api.security.JwtFilter;
-import com.laspalmas.api.service.UsuarioDetailsServiceImpl;
+import com.laspalmas.api.service.impl.UsuarioDetailsServiceImpl;
+
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;

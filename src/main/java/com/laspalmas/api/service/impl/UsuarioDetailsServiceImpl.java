@@ -1,4 +1,4 @@
-package com.laspalmas.api.service;
+package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.repository.UsuarioRepository;

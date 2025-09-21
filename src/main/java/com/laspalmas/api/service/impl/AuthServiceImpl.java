@@ -1,9 +1,10 @@
-package com.laspalmas.api.service;
+package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.model.enu.Rol;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
+import com.laspalmas.api.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 

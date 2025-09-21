@@ -1,6 +1,5 @@
 package com.laspalmas.api.security;
 
-import com.laspalmas.api.service.UsuarioDetailsServiceImpl;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.laspalmas.api.service.impl.UsuarioDetailsServiceImpl;
+
 import java.io.IOException;
 
 @Component

@@ -1,4 +1,4 @@
-package com.laspalmas.api.service;
+package com.laspalmas.api.service.impl;
 
 
 import java.io.IOException;
@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.laspalmas.api.repository.MensajeRepository;
 import com.laspalmas.api.repository.PedidoRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
+import com.laspalmas.api.service.MensajeService;
 
 import jakarta.persistence.EntityNotFoundException;
 

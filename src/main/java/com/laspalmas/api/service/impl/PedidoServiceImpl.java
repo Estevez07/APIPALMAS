@@ -1,4 +1,4 @@
-package com.laspalmas.api.service;
+package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.model.Archivo;
 import com.laspalmas.api.model.Pedido;
@@ -7,6 +7,7 @@ import com.laspalmas.api.model.Usuario;
 
 import com.laspalmas.api.repository.PedidoRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
+import com.laspalmas.api.service.PedidoService;
 import com.laspalmas.api.dto.PedidoDTO;
 import com.laspalmas.api.mapper.ArchivoMapper;
 import com.laspalmas.api.mapper.PedidoMapper;
