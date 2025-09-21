@@ -5,6 +5,7 @@ import com.laspalmas.api.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -39,13 +40,28 @@ public class PedidoController {
     public ResponseEntity<PedidoDTO> agregarPedido(@RequestParam("archivos") List<MultipartFile> archivos,
                                                    @AuthenticationPrincipal User usuarioAutenticado) throws IOException {
         String numeroCelular = usuarioAutenticado.getUsername();
-        return ResponseEntity.ok(pedidoService.agregarPedido(archivos, numeroCelular));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.agregarPedido(archivos, numeroCelular));
     }
 
     //  Solo ADMIN
     @DeleteMapping("/{id}")
     public ResponseEntity<String> eliminarPedido(@PathVariable Long id) {
         pedidoService.eliminarPedido(id);
-        return ResponseEntity.ok("Pedido eliminado");
+        return ResponseEntity.noContent().build();
     }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PedidoDTO> modificarPedido(
+            @PathVariable Long idPedido,
+            @RequestParam(required = false) List<MultipartFile> archivos,
+            @AuthenticationPrincipal User usuarioAutenticado
+    ) throws IOException {
+       
+            String numeroCelular = usuarioAutenticado.getUsername();
+            PedidoDTO actualizado = pedidoService.modificarPedido(idPedido, archivos, numeroCelular);
+            return ResponseEntity.ok(actualizado); // 200 OK
+      
+   
+}
 }

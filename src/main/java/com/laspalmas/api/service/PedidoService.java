@@ -17,4 +17,8 @@ public interface PedidoService {
     PedidoDTO agregarPedido(List<MultipartFile> archivos, String numeroCelular) throws IOException;
 
     void eliminarPedido(Long id);
+
+    PedidoDTO modificarPedido(Long id,
+                                  List<MultipartFile> archivos,
+                                  String numeroCelular) throws IOException ;
 }

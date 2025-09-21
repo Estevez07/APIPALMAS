@@ -4,6 +4,7 @@ import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.service.MensajeService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +35,7 @@ public class MensajeController {
 
          String numeroCelular = usuarioAutenticado.getUsername();
 
- return ResponseEntity.ok(mensajeService.enviarMensaje(contenido,archivos,idDestinatario,numeroCelular,idPedido));
+ return ResponseEntity.status(HttpStatus.CREATED).body(mensajeService.enviarMensaje(contenido,archivos,idDestinatario,numeroCelular,idPedido));
 
 
     }
@@ -50,4 +51,34 @@ public class MensajeController {
 
        return ResponseEntity.ok(mensajeService.obtenerMensajesEntreUsuarios(numeroCelular,idDestinatario));
     }
+
+
+// Modificar mensaje (agregar un mapper si es que vienen archivos nuevos........---------------------)
+    @PutMapping("/{id}")
+    public ResponseEntity<?> modificarMensaje(
+            @PathVariable Long id,
+            @RequestParam String nuevoContenido,
+            @AuthenticationPrincipal User usuarioAutenticado
+    ) {
+       
+            String numeroCelular = usuarioAutenticado.getUsername();
+            MensajeDTO actualizado = mensajeService.modificarMensaje(id, nuevoContenido, numeroCelular);
+            return ResponseEntity.ok(actualizado); // 200 OK
+        
+    }
+
+
+     @DeleteMapping("/{id}")
+    public ResponseEntity<String> eliminarMensaje(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User usuarioAutenticado
+    ) {
+        
+            String numeroCelular = usuarioAutenticado.getUsername();
+            mensajeService.eliminarMensaje(id, numeroCelular);
+            return ResponseEntity.noContent().build();
+       
+    }
+
+
 }

@@ -16,4 +16,6 @@ public interface MensajeService {
                                 Long idPedido) throws IOException;
 
      List<MensajeDTO> obtenerMensajesEntreUsuarios(String numeroCelular, Long idDestinatario);
+     MensajeDTO modificarMensaje(Long id, String nuevoContenido, String numeroCelular);
+     void eliminarMensaje(Long id, String numeroCelular);
 }

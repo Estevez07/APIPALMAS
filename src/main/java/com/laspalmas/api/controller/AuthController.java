@@ -1,5 +1,6 @@
 package com.laspalmas.api.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +25,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registrar(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(authService.registrar(usuario));
+         return ResponseEntity.status(HttpStatus.CREATED).body(authService.registrar(usuario));
     }
 
     @PostMapping("/login")

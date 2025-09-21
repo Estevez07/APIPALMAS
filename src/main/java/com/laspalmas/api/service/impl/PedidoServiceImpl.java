@@ -86,5 +86,25 @@ public class PedidoServiceImpl implements PedidoService {
         pedidoRepository.delete(pedido);
     }
 
-  
+@Override
+@PreAuthorize("#numeroCelular == authentication.name or hasAuthority('ADMIN')")
+public PedidoDTO modificarPedido(Long idPedido,
+                                  List<MultipartFile> archivos,
+                                  String numeroCelular) throws IOException {
+    Pedido pedido = pedidoRepository.findById(idPedido)
+            .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
+
+      // Si vienen archivos -> reemplazar la lista
+    if (archivos != null && !archivos.isEmpty()) {
+        List<Archivo> archivosEntidad = archivos.stream()
+                .map(archivoMapper::toEntity)
+                .peek(a -> a.setPedido(pedido))
+                .toList();
+        pedido.setArchivos(archivosEntidad);
+    }
+
+    Pedido actualizado = pedidoRepository.save(pedido);
+    return pedidoMapper.toDTO(actualizado);
+}
+
 }

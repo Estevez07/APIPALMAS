@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,5 +92,35 @@ public class MensajeServiceImpl implements MensajeService{
                 .map(mensajeMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+@Override
+@PreAuthorize("#numeroCelular == authentication.name")
+public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String numeroCelular) {
+    Mensaje mensaje = mensajeRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
+
+    // Verificar que el usuario autenticado sea el remitente
+    if (!mensaje.getRemitente().getNumeroCelular().equals(numeroCelular)) {
+        throw new SecurityException("No tienes permisos para modificar este mensaje");
+    }
+
+    mensaje.setContenido(nuevoContenido);
+    Mensaje actualizado = mensajeRepository.save(mensaje);
+    return mensajeMapper.toDTO(actualizado);
+}
+
+    @Override
+    @PreAuthorize("#numeroCelular == authentication.name")
+    public void eliminarMensaje(Long id, String numeroCelular) {
+    Mensaje mensaje = mensajeRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
+
+    // Validar que el usuario autenticado sea el remitente
+    if (!mensaje.getRemitente().getNumeroCelular().equals(numeroCelular)) {
+        throw new SecurityException("No tienes permisos para eliminar este mensaje");
+    }
+
+    mensajeRepository.delete(mensaje);
+}
     
 }
