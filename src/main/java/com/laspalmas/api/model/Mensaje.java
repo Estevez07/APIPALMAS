@@ -15,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -50,9 +51,9 @@ public class Mensaje {
     private EstadoMensaje estado = EstadoMensaje.ENVIADO;
 
     // Opcional: mensaje con archivo adjunto
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "archivo_id")
-    List<Archivo> archivos;
+    private List<Archivo> archivos;
 
     // Opcional: mensaje que representa un pedido
     @OneToOne
