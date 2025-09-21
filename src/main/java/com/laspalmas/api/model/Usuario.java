@@ -72,6 +72,15 @@ public class Usuario {
     @Column(length = 10, nullable = false)
     private Rol rol; // USER o ADMIN
 
+      // De dónde proviene el usuario
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
+    private Provider provider = Provider.LOCAL;
+
+    // ID que devuelve el proveedor (ej. el id de Facebook)
+    @Column(length = 100, unique = true)
+    private String providerId;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Pedido> pedidos;
 }

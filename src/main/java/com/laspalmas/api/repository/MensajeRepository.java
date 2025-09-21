@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface MensajeRepository extends JpaRepository<Mensaje, Long> {
     List<Mensaje> findByRemitenteAndDestinatario(Usuario remitente, Usuario destinatario);
-    List<Mensaje> findByDestinatario(Usuario destinatario);
+   
 }
