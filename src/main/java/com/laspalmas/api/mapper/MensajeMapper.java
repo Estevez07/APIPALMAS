@@ -1,7 +1,7 @@
 package com.laspalmas.api.mapper;
 
 
-import com.laspalmas.api.model.MensajeDTO;
+import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.model.Mensaje;
 import org.mapstruct.*;
 

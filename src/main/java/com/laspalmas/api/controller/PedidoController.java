@@ -1,6 +1,6 @@
 package com.laspalmas.api.controller;
 
-import com.laspalmas.api.model.PedidoDTO;
+import com.laspalmas.api.dto.PedidoDTO;
 import com.laspalmas.api.service.PedidoService;
 
 import lombok.RequiredArgsConstructor;

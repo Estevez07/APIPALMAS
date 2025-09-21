@@ -16,9 +16,9 @@ import com.laspalmas.api.repository.UsuarioRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import com.laspalmas.api.model.Mensaje;
-import com.laspalmas.api.model.MensajeDTO;
 import com.laspalmas.api.model.Pedido;
 import com.laspalmas.api.model.Usuario;
+import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.mapper.ArchivoMapper;
 import com.laspalmas.api.mapper.MensajeMapper;
 

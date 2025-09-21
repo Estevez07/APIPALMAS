@@ -1,7 +1,8 @@
 package com.laspalmas.api.service;
 
-import com.laspalmas.api.model.PedidoDTO;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.laspalmas.api.dto.PedidoDTO;
 
 import java.io.IOException;
 import java.util.List;

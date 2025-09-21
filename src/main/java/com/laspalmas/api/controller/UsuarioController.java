@@ -1,7 +1,7 @@
 package com.laspalmas.api.controller;
 
 
-import com.laspalmas.api.model.UsuarioDTO;
+import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.service.UsuarioService;
 
 import lombok.RequiredArgsConstructor;

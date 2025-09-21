@@ -1,7 +1,8 @@
 package com.laspalmas.api.mapper;
 
+import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.model.Usuario;
-import com.laspalmas.api.model.UsuarioDTO;
+
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.laspalmas.api.model.MensajeDTO;
+import com.laspalmas.api.dto.MensajeDTO;
 
 public interface MensajeService {
 

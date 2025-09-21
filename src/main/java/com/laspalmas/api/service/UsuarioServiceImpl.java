@@ -1,6 +1,6 @@
 package com.laspalmas.api.service;
 
-import com.laspalmas.api.model.UsuarioDTO;
+import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.mapper.UsuarioMapper;
 
 import com.laspalmas.api.repository.UsuarioRepository;

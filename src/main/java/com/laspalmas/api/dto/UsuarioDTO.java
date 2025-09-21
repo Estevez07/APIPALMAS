@@ -1,4 +1,4 @@
-package com.laspalmas.api.model;
+package com.laspalmas.api.dto;
 
 import java.util.Date;
 

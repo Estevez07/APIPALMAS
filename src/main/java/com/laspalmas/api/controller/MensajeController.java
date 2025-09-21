@@ -1,6 +1,6 @@
 package com.laspalmas.api.controller;
 
-import com.laspalmas.api.model.MensajeDTO;
+import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.service.MensajeService;
 import lombok.RequiredArgsConstructor;
 

@@ -1,7 +1,7 @@
 package com.laspalmas.api.mapper;
 
+import com.laspalmas.api.dto.ArchivoDTO;
 import com.laspalmas.api.model.Archivo;
-import com.laspalmas.api.model.ArchivoDTO;
 
 import org.mapstruct.*;
 import org.springframework.web.multipart.MultipartFile;
