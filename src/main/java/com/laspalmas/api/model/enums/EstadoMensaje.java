@@ -1,4 +1,4 @@
-package com.laspalmas.api.model.enu;
+package com.laspalmas.api.model.enums;
 
 public enum EstadoMensaje {
   ENVIADO,

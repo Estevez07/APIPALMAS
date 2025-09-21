@@ -3,8 +3,8 @@ package com.laspalmas.api.model;
 import java.util.Date;
 import java.util.List;
 
-import com.laspalmas.api.model.enu.Provider;
-import com.laspalmas.api.model.enu.Rol;
+import com.laspalmas.api.model.enums.Provider;
+import com.laspalmas.api.model.enums.Rol;
 import com.laspalmas.api.validation.CorreoOCelular;
 
 import jakarta.persistence.CascadeType;

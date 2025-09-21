@@ -3,7 +3,7 @@ package com.laspalmas.api.model;
 import java.util.Date;
 import java.util.List;
 
-import com.laspalmas.api.model.enu.EstadoMensaje;
+import com.laspalmas.api.model.enums.EstadoMensaje;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
