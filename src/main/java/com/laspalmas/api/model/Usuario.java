@@ -53,14 +53,12 @@ public class Usuario {
     @Size(min = 8, message = "La contraseña debe tener mas de 8 caracteres")
     private String contraseña;
   
-    @Column(unique = true,length = 13, nullable = false)
-    @NotBlank(message = "El numero telefonico no puede estar vacío")
-    @Pattern(regexp = "\\d{13}", message = "El número telefónico debe contener exactamente 13 dígitos")
-    @Size(min = 13, max = 13, message = "El numero telefonico debe tener exactamente 13 digitos")
+    @Column(unique = true,length = 13, nullable = true)
+    @Pattern(regexp = "\\d{10}", message = "El número telefónico debe contener exactamente 10 dígitos")
+    @Size(min = 10, max = 10, message = "El numero telefonico debe tener exactamente 10 digitos")
     private String numeroCelular;
 
-    @Column(unique = true,length = 50, nullable = false)
-    @NotBlank(message = "El correo electronico no puede estar vacío")
+    @Column(unique = true,length = 50, nullable = true)
     @Email(message = "Debe ingresar un correo electronico válido")
     @Size(min = 10, max = 50, message = "El correo electronico debe tener entre 10 y 50 caracteres")
     private String correo;
@@ -80,7 +78,7 @@ public class Usuario {
     private Provider provider = Provider.LOCAL;
 
     // ID que devuelve el proveedor (ej. el id de Facebook)
-    @Column(length = 100, unique = true)
+    @Column(length = 100, unique = true, nullable = true)
     private String providerId;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
