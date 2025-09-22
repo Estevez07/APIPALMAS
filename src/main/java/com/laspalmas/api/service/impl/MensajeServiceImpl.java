@@ -44,13 +44,15 @@ public class MensajeServiceImpl implements MensajeService{
     @Override
        public MensajeDTO enviarMensaje(String Cotenido, List<MultipartFile> archivos,
                                 Long idDestinatario,
-                                String numeroCelular,
+                                String credencial,
                                 Long idPedido) throws IOException{
        Mensaje mensaje = new Mensaje();
         mensaje.setContenido(Cotenido);
-        // Set remitente y destinatario obligatorios
-        Usuario remitente = usuarioRepository.findByNumeroCelular(numeroCelular)
+      
+
+        Usuario remitente = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new RuntimeException("Remitente no encontrado"));
+
         Usuario destinatario = usuarioRepository.findById(idDestinatario)
                 .orElseThrow(() -> new RuntimeException("Destinatario no encontrado"));
 
@@ -81,9 +83,10 @@ public class MensajeServiceImpl implements MensajeService{
 
 
     @Override
-     public List<MensajeDTO> obtenerMensajesEntreUsuarios(String numeroCelular, Long idDestinatario) {
-        Usuario remitente = usuarioRepository.findByNumeroCelular(numeroCelular)
+     public List<MensajeDTO> obtenerMensajesEntreUsuarios(String credencial, Long idDestinatario) {
+          Usuario remitente = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new RuntimeException("Remitente no encontrado"));
+
         Usuario destinatario = usuarioRepository.findById(idDestinatario)
                 .orElseThrow(() -> new RuntimeException("Destinatario no encontrado"));
 
@@ -94,15 +97,17 @@ public class MensajeServiceImpl implements MensajeService{
     }
 
 @Override
-@PreAuthorize("#numeroCelular == authentication.name")
-public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String numeroCelular) {
+ @PreAuthorize("#credencial == authentication.name")
+public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String credencial) {
     Mensaje mensaje = mensajeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
 
     // Verificar que el usuario autenticado sea el remitente
-    if (!mensaje.getRemitente().getNumeroCelular().equals(numeroCelular)) {
-        throw new SecurityException("No tienes permisos para modificar este mensaje");
-    }
+    if (!(credencial.equals(mensaje.getRemitente().getNumeroCelular()) ||
+              credencial.equals(mensaje.getRemitente().getCorreo()))) {
+            throw new SecurityException("No tienes permisos para modificar este mensaje");
+        }
+
 
     mensaje.setContenido(nuevoContenido);
     Mensaje actualizado = mensajeRepository.save(mensaje);
@@ -110,15 +115,16 @@ public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String numero
 }
 
     @Override
-    @PreAuthorize("#numeroCelular == authentication.name")
-    public void eliminarMensaje(Long id, String numeroCelular) {
+    @PreAuthorize("#credencial == authentication.name")
+    public void eliminarMensaje(Long id, String credencial) {
     Mensaje mensaje = mensajeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
 
     // Validar que el usuario autenticado sea el remitente
-    if (!mensaje.getRemitente().getNumeroCelular().equals(numeroCelular)) {
-        throw new SecurityException("No tienes permisos para eliminar este mensaje");
-    }
+    if (!(credencial.equals(mensaje.getRemitente().getNumeroCelular()) ||
+              credencial.equals(mensaje.getRemitente().getCorreo()))) {
+            throw new SecurityException("No tienes permisos para modificar este mensaje");
+        }
 
     mensajeRepository.delete(mensaje);
 }

@@ -17,13 +17,16 @@ public class UsuarioDetailsServiceImpl implements UserDetailsService {
 
 
     private final UsuarioRepository usuarioRepository;
-
+// El principal sera Correo, si no tiene tomamos su numero de celular
     @Override
-    public UserDetails loadUserByUsername(String numeroCelular) throws UsernameNotFoundException {
-        Usuario usuario = usuarioRepository.findByNumeroCelular(numeroCelular)
-                .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario"));
+    public UserDetails loadUserByUsername(String credencial) throws UsernameNotFoundException {
+         Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
+            .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario"));
 
-        return new User(usuario.getNumeroCelular(), usuario.getContraseña(),
+    
+    String username = usuario.getCorreo() != null ? usuario.getCorreo() : usuario.getNumeroCelular();
+
+        return new User(username , usuario.getContraseña(),
                 List.of(new SimpleGrantedAuthority(usuario.getRol().toString())));
     }
 }

@@ -30,17 +30,17 @@ public class PedidoController {
     }
 
     //  ADMIN o el mismo usuario autenticado
-    @GetMapping("/{numeroCelular}")
-    public ResponseEntity<List<PedidoDTO>> obtenerPorUsuario(@PathVariable String numeroCelular) {
-        return ResponseEntity.ok(pedidoService.obtenerPedidosPorUsuario(numeroCelular));
+    @GetMapping("/{credencial}")
+    public ResponseEntity<List<PedidoDTO>> obtenerPorUsuario(@PathVariable String credencial) {
+        return ResponseEntity.ok(pedidoService.obtenerPedidosPorUsuario(credencial));
     }
 
     //  USER autenticado
     @PostMapping
     public ResponseEntity<PedidoDTO> agregarPedido(@RequestParam("archivos") List<MultipartFile> archivos,
                                                    @AuthenticationPrincipal User usuarioAutenticado) throws IOException {
-        String numeroCelular = usuarioAutenticado.getUsername();
-        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.agregarPedido(archivos, numeroCelular));
+        String credencial = usuarioAutenticado.getUsername();
+        return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.agregarPedido(archivos, credencial));
     }
 
     //  Solo ADMIN
@@ -58,8 +58,8 @@ public class PedidoController {
             @AuthenticationPrincipal User usuarioAutenticado
     ) throws IOException {
        
-            String numeroCelular = usuarioAutenticado.getUsername();
-            PedidoDTO actualizado = pedidoService.modificarPedido(idPedido, archivos, numeroCelular);
+            String credencial = usuarioAutenticado.getUsername();
+            PedidoDTO actualizado = pedidoService.modificarPedido(idPedido, archivos, credencial);
             return ResponseEntity.ok(actualizado); // 200 OK
       
    

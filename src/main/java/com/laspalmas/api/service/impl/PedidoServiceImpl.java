@@ -45,9 +45,9 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    @PreAuthorize("#numeroCelular == authentication.name or hasAuthority('ADMIN')")
-    public List<PedidoDTO> obtenerPedidosPorUsuario(String numeroCelular) {
-        Usuario usuario = usuarioRepository.findByNumeroCelular(numeroCelular)
+    @PreAuthorize("#credencial == authentication.name or hasAuthority('ADMIN')")
+    public List<PedidoDTO> obtenerPedidosPorUsuario(String credencial) {
+        Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
      return pedidoRepository.findByUsuario(usuario).stream()
@@ -58,8 +58,8 @@ public class PedidoServiceImpl implements PedidoService {
 
     @Override
     @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
-    public PedidoDTO agregarPedido(List<MultipartFile> archivos, String numeroCelular) throws IOException {
-        Usuario usuario = usuarioRepository.findByNumeroCelular(numeroCelular)
+    public PedidoDTO agregarPedido(List<MultipartFile> archivos, String credencial) throws IOException {
+        Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
 
         Pedido pedido = new Pedido();
@@ -87,10 +87,10 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
 @Override
-@PreAuthorize("#numeroCelular == authentication.name or hasAuthority('ADMIN')")
+@PreAuthorize("#credencial == authentication.name or hasAuthority('ADMIN')")
 public PedidoDTO modificarPedido(Long idPedido,
                                   List<MultipartFile> archivos,
-                                  String numeroCelular) throws IOException {
+                                  String credencial) throws IOException {
     Pedido pedido = pedidoRepository.findById(idPedido)
             .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
 

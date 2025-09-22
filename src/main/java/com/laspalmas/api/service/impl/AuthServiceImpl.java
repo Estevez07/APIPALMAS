@@ -33,10 +33,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String registrar(Usuario usuario) {
-        if (usuarioRepository.findByNumeroCelular(usuario.getNumeroCelular()).isPresent()) {
-            throw new RuntimeException("El número ya está registrado");
-        }
 
+        
+        if (usuarioRepository.findByCorreoOrNumeroCelular(usuario.getCorreo(), usuario.getNumeroCelular())
+        .isPresent()) {
+             throw new RuntimeException("El correo o número de celular ya está registrado");
+        }
         usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
         usuario.setRol(Rol.USER);
         usuarioRepository.save(usuario);
@@ -44,13 +46,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-   public Map<String, String> login(String numeroCelular, String contraseña) {
+   public Map<String, String> login(String credencial, String contraseña) {
     Authentication auth = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(numeroCelular, contraseña)
+        new UsernamePasswordAuthenticationToken(credencial, contraseña)
     );
 
     String rol = auth.getAuthorities().iterator().next().getAuthority();
-    String token = jwtUtil.generateToken(numeroCelular, rol);
+    String token = jwtUtil.generateToken(credencial, rol);
 
     Map<String, String> response = new HashMap<>();
     response.put("token", "Bearer " + token);

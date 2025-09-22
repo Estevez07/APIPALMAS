@@ -33,9 +33,9 @@ public class MensajeController {
     ) throws IOException {
 
 
-         String numeroCelular = usuarioAutenticado.getUsername();
+         String credencial = usuarioAutenticado.getUsername();
 
- return ResponseEntity.status(HttpStatus.CREATED).body(mensajeService.enviarMensaje(contenido,archivos,idDestinatario,numeroCelular,idPedido));
+ return ResponseEntity.status(HttpStatus.CREATED).body(mensajeService.enviarMensaje(contenido,archivos,idDestinatario,credencial,idPedido));
 
 
     }
@@ -47,9 +47,9 @@ public class MensajeController {
             @RequestParam Long idDestinatario
     ) {
         
-        String numeroCelular = usuarioAutenticado.getUsername();
+        String credencial = usuarioAutenticado.getUsername();
 
-       return ResponseEntity.ok(mensajeService.obtenerMensajesEntreUsuarios(numeroCelular,idDestinatario));
+       return ResponseEntity.ok(mensajeService.obtenerMensajesEntreUsuarios(credencial,idDestinatario));
     }
 
 
@@ -61,8 +61,8 @@ public class MensajeController {
             @AuthenticationPrincipal User usuarioAutenticado
     ) {
        
-            String numeroCelular = usuarioAutenticado.getUsername();
-            MensajeDTO actualizado = mensajeService.modificarMensaje(id, nuevoContenido, numeroCelular);
+            String credencial = usuarioAutenticado.getUsername();
+            MensajeDTO actualizado = mensajeService.modificarMensaje(id, nuevoContenido, credencial);
             return ResponseEntity.ok(actualizado); // 200 OK
         
     }
@@ -74,8 +74,8 @@ public class MensajeController {
             @AuthenticationPrincipal User usuarioAutenticado
     ) {
         
-            String numeroCelular = usuarioAutenticado.getUsername();
-            mensajeService.eliminarMensaje(id, numeroCelular);
+            String credencial = usuarioAutenticado.getUsername();
+            mensajeService.eliminarMensaje(id, credencial);
             return ResponseEntity.noContent().build();
        
     }

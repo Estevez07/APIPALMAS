@@ -11,14 +11,14 @@ public interface PedidoService {
 
     List<PedidoDTO> obtenerTodosLosPedidos();
 
-    List<PedidoDTO> obtenerPedidosPorUsuario(String numeroCelular);
+    List<PedidoDTO> obtenerPedidosPorUsuario(String credencial);
 
     // Acepta lista de archivos y devuelve Pedido con metadatos
-    PedidoDTO agregarPedido(List<MultipartFile> archivos, String numeroCelular) throws IOException;
+    PedidoDTO agregarPedido(List<MultipartFile> archivos, String credencial) throws IOException;
 
     void eliminarPedido(Long id);
 
     PedidoDTO modificarPedido(Long id,
                                   List<MultipartFile> archivos,
-                                  String numeroCelular) throws IOException ;
+                                  String credencial) throws IOException ;
 }

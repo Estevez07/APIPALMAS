@@ -12,10 +12,10 @@ public interface MensajeService {
 
      MensajeDTO enviarMensaje(String Cotenido, List<MultipartFile> archivo,
                                 Long idDestinatario,
-                                String numeroCelular,
+                                String credencial,
                                 Long idPedido) throws IOException;
 
-     List<MensajeDTO> obtenerMensajesEntreUsuarios(String numeroCelular, Long idDestinatario);
-     MensajeDTO modificarMensaje(Long id, String nuevoContenido, String numeroCelular);
-     void eliminarMensaje(Long id, String numeroCelular);
+     List<MensajeDTO> obtenerMensajesEntreUsuarios(String credencial, Long idDestinatario);
+     MensajeDTO modificarMensaje(Long id, String nuevoContenido, String credencial);
+     void eliminarMensaje(Long id, String credencial);
 }
