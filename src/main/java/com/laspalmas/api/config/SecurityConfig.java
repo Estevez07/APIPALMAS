@@ -30,8 +30,9 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, U
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .userDetailsService(uds)
         .oauth2Login(oauth2 -> oauth2
-            .defaultSuccessUrl("/login/success", true) 
-        );
+    .defaultSuccessUrl("/login/success", true)
+    .failureUrl("/login/failed")  // <-- Aquí agregas la ruta de fallo
+);
 
     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
