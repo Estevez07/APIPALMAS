@@ -15,9 +15,9 @@ public class JwtUtil {
     private long EXPIRATION_TIME; 
 
 
-    public String generateToken(String numeroCelular, String rol) {
+    public String generateToken(String credencial, String rol) {
         return Jwts.builder()
-                .setSubject(numeroCelular)
+                .setSubject(credencial)
                 .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -25,7 +25,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String getNumeroCelularFromToken(String token) {
+    public String getCredencialFromToken(String token) {
         return Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject();
     }
 

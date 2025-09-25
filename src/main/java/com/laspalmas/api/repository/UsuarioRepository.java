@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.laspalmas.api.model.Usuario;
+import com.laspalmas.api.model.enums.Provider;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
   @Query("SELECT DISTINCT u FROM Usuario u JOIN u.pedidos p")
   List<Usuario> findUsuariosConPedidos();
+
+  Optional<Usuario> findByProviderAndProviderId(Provider provider, String providerId);
 }

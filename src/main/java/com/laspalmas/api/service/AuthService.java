@@ -5,5 +5,6 @@ import com.laspalmas.api.model.Usuario;
 
 public interface AuthService {
     String registrar(Usuario usuario);
-    public Map<String, String>login(String numeroCelular, String contraseña);
+    public Map<String, String>login(String credencial, String contraseña);
+
 }

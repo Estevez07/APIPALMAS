@@ -1,16 +1,14 @@
 package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.model.Usuario;
-import com.laspalmas.api.model.enums.Rol;
+
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
 import com.laspalmas.api.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
 import java.util.Map;
-
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final JwtUtil jwtUtil;
 
+   
     @Override
     public String registrar(Usuario usuario) {
 
@@ -40,7 +39,6 @@ public class AuthServiceImpl implements AuthService {
              throw new RuntimeException("El correo o número de celular ya está registrado");
         }
         usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
-        usuario.setRol(Rol.USER);
         usuarioRepository.save(usuario);
         return "Usuario registrado correctamente";
     }
@@ -54,10 +52,8 @@ public class AuthServiceImpl implements AuthService {
     String rol = auth.getAuthorities().iterator().next().getAuthority();
     String token = jwtUtil.generateToken(credencial, rol);
 
-    Map<String, String> response = new HashMap<>();
-    response.put("token", "Bearer " + token);
-    response.put("rol", rol);
-    return response;
+      return Map.of("token", "Bearer " + token, "rol", rol);
 }
+
 
 }
