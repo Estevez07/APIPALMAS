@@ -22,4 +22,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
   List<Usuario> findUsuariosConPedidos();
 
   Optional<Usuario> findByProviderAndProviderId(Provider provider, String providerId);
+
+  Optional<Usuario> findByVerficationToken(String token);
+  Optional<Usuario> findByResetToken(String resetToken);
+  Optional<Usuario> findByCorreo(String correo);
 }

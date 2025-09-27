@@ -5,10 +5,14 @@ import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
 import com.laspalmas.api.service.AuthService;
+import com.laspalmas.api.service.CorreoService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,20 +31,55 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final CorreoService CorreoService;
+
     private final JwtUtil jwtUtil;
 
    
     @Override
     public String registrar(Usuario usuario) {
 
-        
-        if (usuarioRepository.findByCorreoOrNumeroCelular(usuario.getCorreo(), usuario.getNumeroCelular())
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByCorreoOrNumeroCelular(usuario.getCorreo(), usuario.getNumeroCelular());
+        if (usuarioExistente
         .isPresent()) {
-             throw new RuntimeException("El correo o número de celular ya está registrado");
+           Usuario existente = usuarioExistente.get();
+     if (existente.isVerified()) {
+            throw new RuntimeException("El usuario ya existe y está verificado");
+        } else if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
+            // Regenerar token de verificación con UUID si tiene correo
+            String verificationToken = UUID.randomUUID().toString();
+            existente.setVerficationToken(verificationToken);
+            existente.setTokenExpiry(LocalDateTime.now().plusHours(24));
+            usuarioRepository.save(existente);
+
+            // Enviar correo de verificación
+            CorreoService.sendVerificationEmail(existente.getCorreo(), verificationToken);
+            return "Correo de verificación reenviado. Revisa tu bandeja de entrada";
+        } else {
+            // Usuario con solo número de celular, no requiere verificación
+            return "El usuario ya existe pero no requiere verificación de correo";
         }
-        usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
-        usuarioRepository.save(usuario);
-        return "Usuario registrado correctamente";
+
+        }
+
+          
+      // Nuevo registro
+    usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
+
+    if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
+        String verificationToken = UUID.randomUUID().toString();
+        usuario.setVerficationToken(verificationToken);
+        usuario.setTokenExpiry(LocalDateTime.now().plusHours(24));
+        // Enviar correo de verificación
+        CorreoService.sendVerificationEmail(usuario.getCorreo(), verificationToken);
+    } else {
+        // Si no hay correo, no se requiere verificación
+        usuario.setVerified(true);
+    }
+
+    usuarioRepository.save(usuario);
+
+        return "¡Registro exitoso! Por favor, verifique su correo electrónico.";
     }
 
     @Override

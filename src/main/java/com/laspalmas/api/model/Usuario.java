@@ -1,5 +1,6 @@
 package com.laspalmas.api.model;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -77,6 +78,22 @@ public class Usuario {
     // ID que devuelve el proveedor (ej. el id de Facebook)
     @Column(length = 100, unique = true, nullable = true)
     private String providerId;
+
+       // Token de verificación
+    @Column(name = "verification_token", length = 100, unique = true)
+    private String verficationToken;
+
+    @Column(name = "token_expiry")
+    private LocalDateTime tokenExpiry;
+   
+    private boolean isVerified = false;
+
+    //  Token de reseteo de contraseña
+    @Column(name = "reset_token", length = 100, unique = true)
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Pedido> pedidos;
