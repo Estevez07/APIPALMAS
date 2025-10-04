@@ -27,12 +27,12 @@ public class VerificationController {
 
      
     @GetMapping("/auth/register/verify")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+    public ResponseEntity<?> verifyOtp(@RequestParam String correo, @RequestParam String otp) {
        
-        Optional<Usuario> existe = usuarioRepository.findByVerficationToken(token);
+        Optional<Usuario> existe = usuarioRepository.findByCorreo(correo);
         
           if (existe.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token inválido o expirado!");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuario no encontrado");
     }
 
     Usuario user = existe.get();
@@ -42,8 +42,11 @@ public class VerificationController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token expirado!");
     }
 
-        user = existe.get();
-        user.setVerficationToken(null);
+     if (!user.getVerificationToken().equals(otp)) {
+        return ResponseEntity.badRequest().body("Código incorrecto");
+    }
+
+        user.setVerificationToken(null);
         user.setVerified(true);  
         user.setTokenExpiry(null);
         usuarioRepository.save(user);

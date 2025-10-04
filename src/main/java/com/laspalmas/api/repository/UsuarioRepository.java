@@ -15,7 +15,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
   Optional<Usuario> findByCorreoOrNumeroCelular(String correo, String numeroCelular);
     
 
-  @Query("SELECT u FROM Usuario u WHERE u.correo = :credencial OR u.numeroCelular = :credencial")
+  @Query("SELECT u FROM Usuario u WHERE (u.correo = :credencial OR u.numeroCelular = :credencial) AND u.isVerified = true")
   Optional<Usuario> buscarPorCredencial(@Param("credencial") String credencial);
 
   @Query("SELECT DISTINCT u FROM Usuario u JOIN u.pedidos p")

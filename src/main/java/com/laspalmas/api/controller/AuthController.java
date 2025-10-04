@@ -31,7 +31,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario usuario) {
-        return ResponseEntity.ok(authService.login(usuario.getNumeroCelular(), usuario.getContraseña()));
+        String credencial = usuario.getCorreo()!=null? usuario.getCorreo() : usuario.getNumeroCelular();
+        return ResponseEntity.ok(authService.login(credencial, usuario.getContraseña()));
     }
 
 }

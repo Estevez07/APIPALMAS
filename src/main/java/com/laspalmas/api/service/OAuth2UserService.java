@@ -44,6 +44,7 @@ public class OAuth2UserService {
                     nuevo.setNombre(nombre);
                     nuevo.setApellidos(apellidos);
                     nuevo.setCorreo(correo);
+                    nuevo.setVerified(true);
                     // Para usuarios OAuth, fechaNac y contraseña pueden quedar nulas
                     return usuarioRepository.save(nuevo);
                 });

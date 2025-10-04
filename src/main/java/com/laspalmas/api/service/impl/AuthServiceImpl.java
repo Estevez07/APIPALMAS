@@ -12,7 +12,8 @@ import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.Random;
+
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final CorreoService CorreoService;
+    private final CorreoService correoService;
 
     private final JwtUtil jwtUtil;
 
@@ -47,13 +48,14 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("El usuario ya existe y está verificado");
         } else if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
             // Regenerar token de verificación con UUID si tiene correo
-            String verificationToken = UUID.randomUUID().toString();
-            existente.setVerficationToken(verificationToken);
-            existente.setTokenExpiry(LocalDateTime.now().plusHours(24));
+             String otp = generateOtp();
+             usuario.setVerificationToken(otp);
+             usuario.setTokenExpiry(LocalDateTime.now().plusMinutes(10)); // caduca en 10 min
+    
             usuarioRepository.save(existente);
 
-            // Enviar correo de verificación
-            CorreoService.sendVerificationEmail(existente.getCorreo(), verificationToken);
+            // Enviar de nuevo el correo de verificación
+            correoService.sendOtpEmail(usuario.getCorreo(), otp);
             return "Correo de verificación reenviado. Revisa tu bandeja de entrada";
         } else {
             // Usuario con solo número de celular, no requiere verificación
@@ -67,11 +69,11 @@ public class AuthServiceImpl implements AuthService {
     usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
 
     if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
-        String verificationToken = UUID.randomUUID().toString();
-        usuario.setVerficationToken(verificationToken);
-        usuario.setTokenExpiry(LocalDateTime.now().plusHours(24));
+        String otp = generateOtp();
+        usuario.setVerificationToken(otp);
+        usuario.setTokenExpiry(LocalDateTime.now().plusMinutes(10)); // caduca en 10 min
         // Enviar correo de verificación
-        CorreoService.sendVerificationEmail(usuario.getCorreo(), verificationToken);
+        correoService.sendOtpEmail(usuario.getCorreo(), otp);
     } else {
         // Si no hay correo, no se requiere verificación
         usuario.setVerified(true);
@@ -94,5 +96,10 @@ public class AuthServiceImpl implements AuthService {
       return Map.of("token", "Bearer " + token, "rol", rol);
 }
 
+private String generateOtp() {
+    Random random = new Random();
+    int otp = 100000 + random.nextInt(900000); // genera un número entre 100000 y 999999
+    return String.valueOf(otp);
+}
 
 }

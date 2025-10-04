@@ -80,8 +80,8 @@ public class Usuario {
     private String providerId;
 
        // Token de verificación
-    @Column(name = "verification_token", length = 100, unique = true)
-    private String verficationToken;
+    @Column(name = "verification_token", length = 6)
+    private String verificationToken;
 
     @Column(name = "token_expiry")
     private LocalDateTime tokenExpiry;
@@ -89,7 +89,7 @@ public class Usuario {
     private boolean isVerified = false;
 
     //  Token de reseteo de contraseña
-    @Column(name = "reset_token", length = 100, unique = true)
+    @Column(name = "reset_token", length = 6)
     private String resetToken;
 
     @Column(name = "reset_token_expiry")
