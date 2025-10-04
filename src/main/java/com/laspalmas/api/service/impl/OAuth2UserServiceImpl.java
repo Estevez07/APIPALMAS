@@ -71,6 +71,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService{
             ProviderInfo providerInfo = new ProviderInfo();
             providerInfo.setProvider(provider);
             providerInfo.setProviderId(providerId);
+            providerInfo.setUsuario(usuario);
             usuario.setProviderInfo(providerInfo);
 
             usuario = usuarioRepository.save(usuario);

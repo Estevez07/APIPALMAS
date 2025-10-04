@@ -1,10 +1,10 @@
 package com.laspalmas.api.model;
 
-import java.time.LocalDateTime;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.laspalmas.api.model.enums.Provider;
 import com.laspalmas.api.model.enums.Rol;
 import com.laspalmas.api.validation.CorreoOCelular;
 import com.laspalmas.api.validation.UsuarioLocal;
@@ -77,8 +77,8 @@ public class Usuario {
     private ProviderInfo providerInfo;
 
     // Relación uno a muchos con tokens (verificación, reset, etc.)
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<TokenUsuario> tokens;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TokenUsuario> tokens = new ArrayList<>();
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Pedido> pedidos;

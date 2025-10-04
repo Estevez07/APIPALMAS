@@ -3,7 +3,9 @@ package com.laspalmas.api.service.impl;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.model.TokenUsuario;
@@ -12,14 +14,18 @@ import com.laspalmas.api.repository.TokenRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.service.VerificationService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+@Service
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService{
 private final UsuarioRepository usuarioRepository;
 private final TokenRepository tokenRepository;
  private final PasswordEncoder passwordEncoder;
     @Override
+    @Transactional
+    @Modifying
     public String verificacionOTP(String correo, String otp) {
          Optional<Usuario> existe = usuarioRepository.findByCorreo(correo);
         
@@ -41,19 +47,18 @@ private final TokenRepository tokenRepository;
        
         // Validar OTP y expiración
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            tokenRepository.delete(token);
+          tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.VERIFICACION);
             throw new RuntimeException("Código expirado");
         }
 
      if (!token.getToken().equals(otp)) {
             throw new RuntimeException("Código incorrecto");
         }
-         // Marcar usuario como verificado
-        user.setVerified(true);
+       user.setVerified(true);
          // Eliminar token después de verificar
-        tokenRepository.delete(token);
-
-        usuarioRepository.save(user);
+        
+       tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.VERIFICACION);
+       usuarioRepository.save(user);  
         
         return "Correo electrónico verificado exitosamente!";
     }
@@ -63,6 +68,7 @@ private final TokenRepository tokenRepository;
 
 
     @Override
+    @Transactional
     public String verificacionOTPPassword(String correo, String otp, String newPassword) {
         Optional<Usuario> existe = usuarioRepository.findByCorreo(correo);
         
@@ -84,7 +90,9 @@ private final TokenRepository tokenRepository;
    
      // Validar expiración
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-            tokenRepository.delete(token);
+       
+         tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.RESET);
+          usuarioRepository.save(user);
             throw new RuntimeException("Código expirado");
         }
 
@@ -96,8 +104,8 @@ private final TokenRepository tokenRepository;
         user.setContraseña(passwordEncoder.encode(newPassword));
 
         // Eliminar token de recuperación
-        tokenRepository.delete(token);
-
+   
+    tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.RESET);
         usuarioRepository.save(user);
   return "has cambiado tu contraseña exitosamente!";
     }

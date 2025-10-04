@@ -27,7 +27,7 @@ public class VerificationController {
     return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTP(usuario.getCorreo(),otp));
 
    } 
-    @PostMapping("/register/forgot_password")
+    @PostMapping("/forgot_password")
     public ResponseEntity<?> resetPassword(@RequestBody Usuario usuario) {
          String otp = usuario.getTokens().get(0).getToken();
     return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTPPassword(usuario.getCorreo(),otp,usuario.getContraseña()));

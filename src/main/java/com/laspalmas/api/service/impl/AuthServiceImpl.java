@@ -11,6 +11,7 @@ import com.laspalmas.api.security.JwtUtil;
 import com.laspalmas.api.service.AuthService;
 import com.laspalmas.api.service.CorreoService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
 
    
     @Override
+    @Transactional
     public String registrar(Usuario usuario) {
 
         Optional<Usuario> usuarioExistente = usuarioRepository.findByCorreoOrNumeroCelular(usuario.getCorreo(), usuario.getNumeroCelular());
@@ -82,9 +84,10 @@ public class AuthServiceImpl implements AuthService {
        // Asignar provider LOCAL por defecto
         ProviderInfo providerInfo = new ProviderInfo();
         providerInfo.setProvider(Provider.LOCAL);
+        providerInfo.setUsuario(usuario);
         usuario.setProviderInfo(providerInfo);
         
-
+  Usuario usuarioGuardado = usuarioRepository.save(usuario);
     if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
        
         String otp = generateOtp();
@@ -92,12 +95,13 @@ public class AuthServiceImpl implements AuthService {
         tokenVerificacion.setToken(otp);
         tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
         tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
-        usuario.getTokens().add(tokenVerificacion);
+        tokenVerificacion.setUsuario(usuarioGuardado);
 
-        correoService.sendOtpEmail(usuario.getCorreo(), otp);
+        tokenRepository.save(tokenVerificacion);
+        correoService.sendOtpEmail(usuarioGuardado.getCorreo(), otp);
     } else {
         usuario.setVerified(true);
-       
+        usuarioRepository.save(usuarioGuardado);
     }
 
      usuarioRepository.save(usuario);
@@ -116,7 +120,7 @@ public class AuthServiceImpl implements AuthService {
 
 Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-            
+
  TokenUsuario tokenLogin = new TokenUsuario();
         tokenLogin.setToken(jwt);
         tokenLogin.setTipo(TokenTipo.LOGIN);
@@ -129,6 +133,7 @@ Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
 }
 
 @Override
+@Transactional
 public String recuperarPassword(String correo) {
      Usuario user = usuarioRepository.findByCorreo(correo)
                 .orElseThrow(() -> new RuntimeException("El usuario no ha sido encontrado"));
@@ -144,7 +149,7 @@ public String recuperarPassword(String correo) {
                 TokenUsuario tokenVerificacion = new TokenUsuario();
                 tokenVerificacion.setToken(otp);
                 tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-                tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
+                tokenVerificacion.setTipo(TokenTipo.RESET);
                 tokenVerificacion.setUsuario(user);
                 tokenRepository.save(tokenVerificacion);
 
