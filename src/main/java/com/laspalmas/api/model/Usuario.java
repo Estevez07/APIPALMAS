@@ -18,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
@@ -70,30 +71,14 @@ public class Usuario {
     @Column(length = 10, nullable = false)
     private Rol rol = Rol.USER; // USER o ADMIN
 
-      // De dónde proviene el usuario
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
-    private Provider provider = Provider.LOCAL;
-
-    // ID que devuelve el proveedor (ej. el id de Facebook)
-    @Column(length = 100, unique = true, nullable = true)
-    private String providerId;
-
-       // Token de verificación
-    @Column(name = "verification_token", length = 6)
-    private String verificationToken;
-
-    @Column(name = "token_expiry")
-    private LocalDateTime tokenExpiry;
-   
     private boolean isVerified = false;
+     // Relación uno a uno con Provider
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private ProviderInfo providerInfo;
 
-    //  Token de reseteo de contraseña
-    @Column(name = "reset_token", length = 6)
-    private String resetToken;
-
-    @Column(name = "reset_token_expiry")
-    private LocalDateTime resetTokenExpiry;
+    // Relación uno a muchos con tokens (verificación, reset, etc.)
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<TokenUsuario> tokens;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
     private List<Pedido> pedidos;

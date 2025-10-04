@@ -1,7 +1,11 @@
 package com.laspalmas.api.service.impl;
 
 import com.laspalmas.api.model.Usuario;
-
+import com.laspalmas.api.model.ProviderInfo;
+import com.laspalmas.api.model.TokenUsuario;
+import com.laspalmas.api.model.enums.Provider;
+import com.laspalmas.api.model.enums.TokenTipo;
+import com.laspalmas.api.repository.TokenRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.security.JwtUtil;
 import com.laspalmas.api.service.AuthService;
@@ -10,6 +14,7 @@ import com.laspalmas.api.service.CorreoService;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -27,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
 
 
     private final UsuarioRepository usuarioRepository;
-
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationManager authenticationManager;
@@ -47,12 +52,20 @@ public class AuthServiceImpl implements AuthService {
      if (existente.isVerified()) {
             throw new RuntimeException("El usuario ya existe y está verificado");
         } else if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
-            // Regenerar token de verificación con UUID si tiene correo
-             String otp = generateOtp();
-             usuario.setVerificationToken(otp);
-             usuario.setTokenExpiry(LocalDateTime.now().plusMinutes(10)); // caduca en 10 min
-    
-            usuarioRepository.save(existente);
+            
+    List<TokenUsuario> tokensExistentes = tokenRepository.findByUsuarioAndTipo(existente, TokenTipo.VERIFICACION);
+
+   
+    if (!tokensExistentes.isEmpty()) {
+        tokenRepository.deleteAll(tokensExistentes);
+    }
+               String otp = generateOtp();
+                TokenUsuario tokenVerificacion = new TokenUsuario();
+                tokenVerificacion.setToken(otp);
+                tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+                tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
+                tokenVerificacion.setUsuario(existente);
+                tokenRepository.save(tokenVerificacion);
 
             // Enviar de nuevo el correo de verificación
             correoService.sendOtpEmail(usuario.getCorreo(), otp);
@@ -63,23 +76,31 @@ public class AuthServiceImpl implements AuthService {
         }
 
         }
-
-          
+   
       // Nuevo registro
     usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
+       // Asignar provider LOCAL por defecto
+        ProviderInfo providerInfo = new ProviderInfo();
+        providerInfo.setProvider(Provider.LOCAL);
+        usuario.setProviderInfo(providerInfo);
+        
 
     if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
+       
         String otp = generateOtp();
-        usuario.setVerificationToken(otp);
-        usuario.setTokenExpiry(LocalDateTime.now().plusMinutes(10)); // caduca en 10 min
-        // Enviar correo de verificación
+        TokenUsuario tokenVerificacion = new TokenUsuario();
+        tokenVerificacion.setToken(otp);
+        tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+        tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
+        usuario.getTokens().add(tokenVerificacion);
+
         correoService.sendOtpEmail(usuario.getCorreo(), otp);
     } else {
-        // Si no hay correo, no se requiere verificación
         usuario.setVerified(true);
+       
     }
 
-    usuarioRepository.save(usuario);
+     usuarioRepository.save(usuario);
 
         return "¡Registro exitoso! Por favor, verifique su correo electrónico.";
     }
@@ -91,15 +112,54 @@ public class AuthServiceImpl implements AuthService {
     );
 
     String rol = auth.getAuthorities().iterator().next().getAuthority();
-    String token = jwtUtil.generateToken(credencial, rol);
+    String jwt = jwtUtil.generateToken(credencial, rol);
 
-      return Map.of("token", "Bearer " + token, "rol", rol);
+Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+ TokenUsuario tokenLogin = new TokenUsuario();
+        tokenLogin.setToken(jwt);
+        tokenLogin.setTipo(TokenTipo.LOGIN);
+        tokenLogin.setExpiryDate(LocalDateTime.now().plusHours(48));
+        tokenLogin.setLoggedOut(false);
+        tokenLogin.setUsuario(usuario);
+
+        tokenRepository.save(tokenLogin);
+      return Map.of("token", "Bearer " + jwt, "rol", rol);
 }
+
+@Override
+public String recuperarPassword(String correo) {
+     Usuario user = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("El usuario no ha sido encontrado"));
+     if (user.isVerified()) {
+
+          List<TokenUsuario> tokensExistentes = tokenRepository.findByUsuarioAndTipo(user, TokenTipo.RESET);
+
+   
+    if (!tokensExistentes.isEmpty()) {
+        tokenRepository.deleteAll(tokensExistentes);
+    }
+                String otp = generateOtp();
+                TokenUsuario tokenVerificacion = new TokenUsuario();
+                tokenVerificacion.setToken(otp);
+                tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
+                tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
+                tokenVerificacion.setUsuario(user);
+                tokenRepository.save(tokenVerificacion);
+
+         
+             correoService.sendForgotPasswordEmail(user.getCorreo(), otp);
+        }else {
+             throw new RuntimeException("El usuario no existe");
+        }
+             return "Verifica un correo para poder recuperar tu contraseña";
+}
+  
 
 private String generateOtp() {
     Random random = new Random();
     int otp = 100000 + random.nextInt(900000); // genera un número entre 100000 y 999999
     return String.valueOf(otp);
 }
-
 }

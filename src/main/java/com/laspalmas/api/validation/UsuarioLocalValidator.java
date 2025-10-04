@@ -12,7 +12,7 @@ public class UsuarioLocalValidator implements ConstraintValidator<UsuarioLocal, 
         if (usuario == null) return true; // otro validator se encargará de null
 
         // Solo validar si el provider es LOCAL
-        if (usuario.getProvider() == Provider.LOCAL) {
+        if (usuario.getProviderInfo().getProvider() == Provider.LOCAL) {
             boolean valid = usuario.getContraseña() != null && !usuario.getContraseña().isBlank()
                          && usuario.getFechaNac() != null;
 

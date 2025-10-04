@@ -35,4 +35,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(credencial, usuario.getContraseña()));
     }
 
+    @PostMapping("/forgot_password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Usuario usuario) {
+         return ResponseEntity.status(HttpStatus.CREATED).body(authService.recuperarPassword(usuario.getCorreo()));
+    }
+
 }

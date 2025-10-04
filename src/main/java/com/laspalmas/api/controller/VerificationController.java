@@ -1,56 +1,38 @@
 package com.laspalmas.api.controller;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.laspalmas.api.model.Usuario;
-import com.laspalmas.api.repository.UsuarioRepository;
+import com.laspalmas.api.service.VerificationService;
 
 import lombok.RequiredArgsConstructor;
 
-@RestController
 @RequiredArgsConstructor
+@RestController
+@RequestMapping("/auth/verify")
 public class VerificationController {
-    
+    private final VerificationService verificationService;
 
-  
-    private final UsuarioRepository usuarioRepository;
-    
 
      
-    @GetMapping("/auth/register/verify")
-    public ResponseEntity<?> verifyOtp(@RequestParam String correo, @RequestParam String otp) {
-       
-        Optional<Usuario> existe = usuarioRepository.findByCorreo(correo);
-        
-          if (existe.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Usuario no encontrado");
-    }
+    @PostMapping("/register")
+    public ResponseEntity<?> verifyOtp(@RequestBody Usuario usuario) {
+         String otp = usuario.getTokens().get(0).getToken();
+    return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTP(usuario.getCorreo(),otp));
 
-    Usuario user = existe.get();
+   } 
+    @PostMapping("/register/forgot_password")
+    public ResponseEntity<?> resetPassword(@RequestBody Usuario usuario) {
+         String otp = usuario.getTokens().get(0).getToken();
+    return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTPPassword(usuario.getCorreo(),otp,usuario.getContraseña()));
+   
 
-    // Validar expiración si existe tokenExpiry
-    if (user.getTokenExpiry() != null && user.getTokenExpiry().isBefore(LocalDateTime.now())) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token expirado!");
-    }
 
-     if (!user.getVerificationToken().equals(otp)) {
-        return ResponseEntity.badRequest().body("Código incorrecto");
-    }
-
-        user.setVerificationToken(null);
-        user.setVerified(true);  
-        user.setTokenExpiry(null);
-        usuarioRepository.save(user);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body("Correo electrónico verificado exitosamente!");
     } 
 }

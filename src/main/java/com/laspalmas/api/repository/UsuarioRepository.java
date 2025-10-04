@@ -21,9 +21,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
   @Query("SELECT DISTINCT u FROM Usuario u JOIN u.pedidos p")
   List<Usuario> findUsuariosConPedidos();
 
-  Optional<Usuario> findByProviderAndProviderId(Provider provider, String providerId);
+ Optional<Usuario> findByProviderInfoProviderAndProviderInfoProviderId(Provider provider, String providerId);
 
-  Optional<Usuario> findByVerficationToken(String token);
-  Optional<Usuario> findByResetToken(String resetToken);
   Optional<Usuario> findByCorreo(String correo);
 }
