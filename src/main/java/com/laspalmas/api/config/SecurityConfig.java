@@ -4,6 +4,8 @@ package com.laspalmas.api.config;
 import com.laspalmas.api.security.JwtFilter;
 import com.laspalmas.api.service.impl.UsuarioDetailsServiceImpl;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,8 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity(prePostEnabled = true) 
 public class SecurityConfig {
 
- @Bean
-public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, UsuarioDetailsServiceImpl uds) throws Exception {
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
+                                       UsuarioDetailsServiceImpl uds,
+                                       CustomLogoutHandler customLogoutHandler) throws Exception {
+
     http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
@@ -29,10 +34,16 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter, U
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .userDetailsService(uds)
+        .logout(logout -> logout
+            .logoutUrl("/logout")
+            .addLogoutHandler(customLogoutHandler)
+            .logoutSuccessHandler((request, response, authentication) ->
+                    response.setStatus(HttpServletResponse.SC_OK))
+        )
         .oauth2Login(oauth2 -> oauth2
-    .defaultSuccessUrl("/login/success", true)
-    .failureUrl("/login/failed")  // <-- Aquí agregas la ruta de fallo
-);
+            .defaultSuccessUrl("/login/success", true)
+            .failureUrl("/login/failed")
+        );
 
     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

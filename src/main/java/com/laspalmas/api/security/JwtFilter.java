@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.laspalmas.api.repository.TokenRepository;
 import com.laspalmas.api.service.impl.UsuarioDetailsServiceImpl;
 
 import java.io.IOException;
@@ -22,6 +23,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final UsuarioDetailsServiceImpl userDetailsService;
 
+    private final TokenRepository tokenRepository;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -32,7 +35,13 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             String credencial = jwtUtil.getCredencialFromToken(token);
 
-            if (credencial != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+         boolean isLoggedOut = tokenRepository.findByToken(token)
+                    .map(t -> t.isLoggedOut())
+                    .orElse(false);
+
+             if (credencial != null && !isLoggedOut &&
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+                    
                 var userDetails = userDetailsService.loadUserByUsername(credencial);
                 if (jwtUtil.validateToken(token)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(

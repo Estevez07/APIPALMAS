@@ -61,13 +61,9 @@ public class AuthServiceImpl implements AuthService {
     if (!tokensExistentes.isEmpty()) {
         tokenRepository.deleteAll(tokensExistentes);
     }
-               String otp = generateOtp();
-                TokenUsuario tokenVerificacion = new TokenUsuario();
-                tokenVerificacion.setToken(otp);
-                tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-                tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
-                tokenVerificacion.setUsuario(existente);
-                tokenRepository.save(tokenVerificacion);
+                String otp = generateOtp();
+
+saveTokenUser(otp,existente,LocalDateTime.now().plusMinutes(10),TokenTipo.VERIFICACION);
 
             // Enviar de nuevo el correo de verificación
             correoService.sendOtpEmail(usuario.getCorreo(), otp);
@@ -91,13 +87,9 @@ public class AuthServiceImpl implements AuthService {
     if (usuario.getCorreo() != null && !usuario.getCorreo().isBlank()) {
        
         String otp = generateOtp();
-        TokenUsuario tokenVerificacion = new TokenUsuario();
-        tokenVerificacion.setToken(otp);
-        tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-        tokenVerificacion.setTipo(TokenTipo.VERIFICACION);
-        tokenVerificacion.setUsuario(usuarioGuardado);
 
-        tokenRepository.save(tokenVerificacion);
+saveTokenUser(otp,usuarioGuardado,LocalDateTime.now().plusMinutes(10),TokenTipo.VERIFICACION);
+
         correoService.sendOtpEmail(usuarioGuardado.getCorreo(), otp);
     } else {
         usuario.setVerified(true);
@@ -121,14 +113,10 @@ public class AuthServiceImpl implements AuthService {
 Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
- TokenUsuario tokenLogin = new TokenUsuario();
-        tokenLogin.setToken(jwt);
-        tokenLogin.setTipo(TokenTipo.LOGIN);
-        tokenLogin.setExpiryDate(LocalDateTime.now().plusHours(48));
-        tokenLogin.setLoggedOut(false);
-        tokenLogin.setUsuario(usuario);
 
-        tokenRepository.save(tokenLogin);
+saveTokenUser(jwt,usuario,LocalDateTime.now().plusHours(48),TokenTipo.LOGIN);
+
+
       return Map.of("token", "Bearer " + jwt, "rol", rol);
 }
 
@@ -146,13 +134,8 @@ public String recuperarPassword(String correo) {
         tokenRepository.deleteAll(tokensExistentes);
     }
                 String otp = generateOtp();
-                TokenUsuario tokenVerificacion = new TokenUsuario();
-                tokenVerificacion.setToken(otp);
-                tokenVerificacion.setExpiryDate(LocalDateTime.now().plusMinutes(10));
-                tokenVerificacion.setTipo(TokenTipo.RESET);
-                tokenVerificacion.setUsuario(user);
-                tokenRepository.save(tokenVerificacion);
 
+saveTokenUser(otp,user,LocalDateTime.now().plusMinutes(10),TokenTipo.RESET);
          
              correoService.sendForgotPasswordEmail(user.getCorreo(), otp);
         }else {
@@ -166,5 +149,18 @@ private String generateOtp() {
     Random random = new Random();
     int otp = 100000 + random.nextInt(900000); // genera un número entre 100000 y 999999
     return String.valueOf(otp);
+}
+
+private void saveTokenUser(String token,Usuario user,LocalDateTime expiryDate,TokenTipo tipo){
+
+        TokenUsuario tokenVerificacion = new TokenUsuario();
+        tokenVerificacion.setToken(token);
+        tokenVerificacion.setExpiryDate(expiryDate);
+        tokenVerificacion.setTipo(tipo);
+        tokenVerificacion.setUsuario(user);
+        if(tipo == TokenTipo.LOGIN){
+        tokenVerificacion.setLoggedOut(false);
+        }
+        tokenRepository.save(tokenVerificacion);
 }
 }
