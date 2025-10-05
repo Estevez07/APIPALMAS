@@ -37,7 +37,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final ArchivoMapper archivoMapper;
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<PedidoDTO> obtenerTodosLosPedidos() {
         return pedidoRepository.findAll().stream()
                 .map(pedidoMapper::toDTO) 

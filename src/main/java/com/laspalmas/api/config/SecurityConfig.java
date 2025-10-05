@@ -28,7 +28,14 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
                                        CustomLogoutHandler customLogoutHandler) throws Exception {
 
     http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
+      .exceptionHandling(ex -> ex
+        .authenticationEntryPoint((request, response, authException) -> {
+            response.setContentType("application/json");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"error\":\"No autorizado o token invalido\"}");
+        })
+    )    
+            .authorizeHttpRequests(auth -> auth
             .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
             .anyRequest().authenticated()
         )
@@ -45,6 +52,7 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
             .failureUrl("/login/failed")
         );
 
+ 
     http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
