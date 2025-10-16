@@ -25,8 +25,8 @@ public class UsuarioDetailsServiceImpl implements UserDetailsService {
 
     
     String username = usuario.getCorreo() != null ? usuario.getCorreo() : usuario.getNumeroCelular();
-
-        return new User(username , usuario.getContraseña(),
+    String password = usuario.getContraseña() != null ? usuario.getContraseña() : "";
+        return new User(username ,password,
                 List.of(new SimpleGrantedAuthority(usuario.getRol().toString())));
     }
 }
