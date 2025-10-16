@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.laspalmas.api.constant.ApiPaths;
+
 
 
 @RestController
@@ -16,7 +18,7 @@ public class OAuth2Controller {
 
 
 
-    @GetMapping("/login/failed")
+    @GetMapping(ApiPaths.LOGIN_FAILED)
       public ResponseEntity<?> loginFailed() {
       return (ResponseEntity<?>) ResponseEntity.badRequest();
     }

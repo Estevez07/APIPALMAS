@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.service.VerificationService;
 
@@ -15,19 +16,19 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/auth/verify")
+@RequestMapping(ApiPaths.AUTH_VERIFY)
 public class VerificationController {
     private final VerificationService verificationService;
 
 
      
-    @PostMapping("/register")
+    @PostMapping(ApiPaths.VERIFY_REGISTER)
     public ResponseEntity<?> verifyOtp(@RequestBody Usuario usuario) {
          String otp = usuario.getTokens().get(0).getToken();
     return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTP(usuario.getCorreo(),otp));
 
    } 
-    @PostMapping("/forgot_password")
+    @PostMapping(ApiPaths.VERIFY_FORGOT_PASSWORD)
     public ResponseEntity<?> resetPassword(@RequestBody Usuario usuario) {
          String otp = usuario.getTokens().get(0).getToken();
     return ResponseEntity.status(HttpStatus.CREATED).body(verificationService.verificacionOTPPassword(usuario.getCorreo(),otp,usuario.getContraseña()));

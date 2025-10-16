@@ -1,5 +1,6 @@
 package com.laspalmas.api.controller;
 
+import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.service.MensajeService;
 import lombok.RequiredArgsConstructor;
@@ -16,14 +17,14 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/mensajes")
+@RequestMapping(ApiPaths.MENSAJES)
 @RequiredArgsConstructor
 public class MensajeController {
 
     private final MensajeService mensajeService;
 
     // Endpoint para enviar un mensaje
-    @PostMapping("/enviar")
+    @PostMapping(ApiPaths.MENSAJES_ENVIAR)
     public ResponseEntity<MensajeDTO> enviarMensaje(
             @RequestParam String contenido,
             @RequestParam(required = false) List<MultipartFile> archivos,
@@ -41,7 +42,7 @@ public class MensajeController {
     }
 
     // Endpoint para obtener todos los mensajes entre dos usuarios
-    @GetMapping("/entre")
+    @GetMapping(ApiPaths.MENSAJES_ENTRE)
     public ResponseEntity<List<MensajeDTO>> obtenerMensajesEntreUsuarios( 
             @AuthenticationPrincipal User usuarioAutenticado,
             @RequestParam Long idDestinatario
@@ -54,7 +55,7 @@ public class MensajeController {
 
 
 // Modificar mensaje (agregar un mapper si es que vienen archivos nuevos........---------------------)
-    @PutMapping("/{id}")
+    @PutMapping(ApiPaths.MENSAJES_ID)
     public ResponseEntity<?> modificarMensaje(
             @PathVariable Long id,
             @RequestParam String nuevoContenido,
@@ -68,7 +69,7 @@ public class MensajeController {
     }
 
 
-     @DeleteMapping("/{id}")
+     @DeleteMapping(ApiPaths.MENSAJES_ID)
     public ResponseEntity<String> eliminarMensaje(
             @PathVariable Long id,
             @AuthenticationPrincipal User usuarioAutenticado

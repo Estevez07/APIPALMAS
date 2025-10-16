@@ -8,6 +8,7 @@ import com.laspalmas.api.model.Usuario;
 import com.laspalmas.api.repository.PedidoRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
 import com.laspalmas.api.service.PedidoService;
+import com.laspalmas.api.constant.Authorization;
 import com.laspalmas.api.dto.PedidoDTO;
 import com.laspalmas.api.mapper.ArchivoMapper;
 import com.laspalmas.api.mapper.PedidoMapper;
@@ -37,7 +38,7 @@ public class PedidoServiceImpl implements PedidoService {
     private final ArchivoMapper archivoMapper;
 
     @Override
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize(Authorization.ADMIN)
     public List<PedidoDTO> obtenerTodosLosPedidos() {
         return pedidoRepository.findAll().stream()
                 .map(pedidoMapper::toDTO) 
@@ -45,7 +46,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    @PreAuthorize("#credencial == authentication.name or hasAuthority('ADMIN')")
+    @PreAuthorize(Authorization.OWNER_OR_ADMIN)
     public List<PedidoDTO> obtenerPedidosPorUsuario(String credencial) {
         Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
@@ -57,7 +58,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('USER') or hasAuthority('ADMIN')")
+    @PreAuthorize(Authorization.USER_OR_ADMIN)
     public PedidoDTO agregarPedido(List<MultipartFile> archivos, String credencial) throws IOException {
         Usuario usuario = usuarioRepository.buscarPorCredencial(credencial)
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
@@ -78,7 +79,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize(Authorization.ADMIN)
     public void eliminarPedido(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Pedido no encontrado"));
@@ -87,7 +88,7 @@ public class PedidoServiceImpl implements PedidoService {
     }
 
 @Override
-@PreAuthorize("#credencial == authentication.name or hasAuthority('ADMIN')")
+@PreAuthorize(Authorization.OWNER_OR_ADMIN)
 public PedidoDTO modificarPedido(Long idPedido,
                                   List<MultipartFile> archivos,
                                   String credencial) throws IOException {

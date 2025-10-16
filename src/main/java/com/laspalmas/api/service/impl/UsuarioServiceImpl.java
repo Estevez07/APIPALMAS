@@ -1,5 +1,6 @@
 package com.laspalmas.api.service.impl;
 
+import com.laspalmas.api.constant.Authorization;
 import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.mapper.UsuarioMapper;
 
@@ -22,7 +23,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioMapper usuarioMapper;
 
     @Override
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize(Authorization.ADMIN)
 
      public List<UsuarioDTO> obtenerUsuariosConPedidos() {
          return usuarioRepository.findAll().stream()

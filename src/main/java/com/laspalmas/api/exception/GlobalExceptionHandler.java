@@ -1,8 +1,8 @@
 package com.laspalmas.api.exception;
-import java.util.Map;
+
 import java.util.stream.Collectors;
 
-import org.springframework.dao.DataIntegrityViolationException;
+
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;

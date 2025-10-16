@@ -1,6 +1,7 @@
 package com.laspalmas.api.controller;
 
 
+import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.dto.UsuarioDTO;
 import com.laspalmas.api.service.UsuarioService;
 
@@ -13,13 +14,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/usuarios")
+@RequestMapping(ApiPaths.USUARIOS)
 public class UsuarioController {
 
  
     private final UsuarioService usuarioService;
 
-    @GetMapping("/con-pedidos")
+    @GetMapping(ApiPaths.USUARIOS_CON_PEDIDOS)
     public ResponseEntity<List<UsuarioDTO>> obtenerUsuariosConPedidos() {
           return ResponseEntity.ok(usuarioService.obtenerUsuariosConPedidos());
     }

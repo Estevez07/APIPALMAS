@@ -20,6 +20,7 @@ import jakarta.persistence.EntityNotFoundException;
 import com.laspalmas.api.model.Mensaje;
 import com.laspalmas.api.model.Pedido;
 import com.laspalmas.api.model.Usuario;
+import com.laspalmas.api.constant.Authorization;
 import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.mapper.ArchivoMapper;
 import com.laspalmas.api.mapper.MensajeMapper;
@@ -97,7 +98,7 @@ public class MensajeServiceImpl implements MensajeService{
     }
 
 @Override
- @PreAuthorize("#credencial == authentication.name")
+ @PreAuthorize(Authorization.OWNER)
 public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String credencial) {
     Mensaje mensaje = mensajeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
@@ -115,7 +116,7 @@ public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String creden
 }
 
     @Override
-    @PreAuthorize("#credencial == authentication.name")
+    @PreAuthorize(Authorization.OWNER)
     public void eliminarMensaje(Long id, String credencial) {
     Mensaje mensaje = mensajeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));

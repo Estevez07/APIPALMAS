@@ -1,5 +1,6 @@
 package com.laspalmas.api.controller;
 
+import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.dto.PedidoDTO;
 import com.laspalmas.api.service.PedidoService;
 
@@ -17,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/pedidos")
+@RequestMapping(ApiPaths.PEDIDOS)
 public class PedidoController {
 
  
@@ -30,7 +31,7 @@ public class PedidoController {
     }
 
     //  ADMIN o el mismo usuario autenticado
-    @GetMapping("/{credencial}")
+    @GetMapping(ApiPaths.PEDIDOS_CREDENCIAL)
     public ResponseEntity<List<PedidoDTO>> obtenerPorUsuario(@PathVariable String credencial) {
         return ResponseEntity.ok(pedidoService.obtenerPedidosPorUsuario(credencial));
     }
@@ -44,14 +45,14 @@ public class PedidoController {
     }
 
     //  Solo ADMIN
-    @DeleteMapping("/{id}")
+    @DeleteMapping(ApiPaths.PEDIDOS_ID)
     public ResponseEntity<String> eliminarPedido(@PathVariable Long id) {
         pedidoService.eliminarPedido(id);
         return ResponseEntity.noContent().build();
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping(ApiPaths.PEDIDOS_ID)
     public ResponseEntity<PedidoDTO> modificarPedido(
             @PathVariable Long idPedido,
             @RequestParam(required = false) List<MultipartFile> archivos,
