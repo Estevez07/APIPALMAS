@@ -12,6 +12,7 @@ import com.laspalmas.api.model.TokenUsuario;
 import com.laspalmas.api.model.enums.TokenTipo;
 import com.laspalmas.api.repository.TokenRepository;
 import com.laspalmas.api.repository.UsuarioRepository;
+import com.laspalmas.api.service.TokenService;
 import com.laspalmas.api.service.VerificationService;
 
 import jakarta.transaction.Transactional;
@@ -22,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 public class VerificationServiceImpl implements VerificationService{
 private final UsuarioRepository usuarioRepository;
 private final TokenRepository tokenRepository;
- private final PasswordEncoder passwordEncoder;
+private final PasswordEncoder passwordEncoder;
+private final TokenService tokenService;
+
     @Override
     @Transactional
     @Modifying
@@ -34,7 +37,6 @@ private final TokenRepository tokenRepository;
     }
 
     Usuario user = existe.get();
-
     Optional<TokenUsuario> tokenOpt = user.getTokens().stream()
                 .filter(t -> t.getTipo() == TokenTipo.VERIFICACION)
                 .findFirst();
@@ -44,10 +46,9 @@ private final TokenRepository tokenRepository;
         }
 
        TokenUsuario token = tokenOpt.get();
-       
         // Validar OTP y expiración
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
-          tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.VERIFICACION);
+          tokenService.eliminarToken(token);
             throw new RuntimeException("Código expirado");
         }
 
@@ -91,8 +92,7 @@ private final TokenRepository tokenRepository;
      // Validar expiración
         if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
        
-         tokenRepository.deleteByUsuarioAndTipo(user, TokenTipo.RESET);
-          usuarioRepository.save(user);
+          tokenService.eliminarToken(token);
             throw new RuntimeException("Código expirado");
         }
 

@@ -38,7 +38,10 @@ paths:
               $ref: '#/components/schemas/Usuario'
       responses:
         '201':
-          description: Usuario registrado correctamente
+          description: >
+           Usuario registrado correctamente.
+           Reenvio de OTP de verificación de correo
+
         '400':
           description: Error en los datos enviados
 
@@ -85,7 +88,7 @@ paths:
   /auth/verify/register:
     post:
       tags: [Verificación]
-      summary: Verificar OTP para completar el registro
+      summary: Verificar OTP EMAIL para completar el registro
       requestBody:
         required: true
         content:
@@ -95,6 +98,12 @@ paths:
       responses:
         '201':
           description: Verificación exitosa
+        '400':
+          description: |
+           Usuario no encontrado.
+           No existe un codigo de verificación activo.
+           Código expirado.
+           Código incorrecto.  
 
   /auth/verify/forgot_password:
     post:
@@ -317,14 +326,14 @@ components:
         contraseña:
           type: string
           example: "claveSegura123"
-        fechaNacimiento:
+        fechaNac:
           format: date
           example: "2002-09-07"
       required:
       - nombre
       - apellidos
       - contraseña
-      - fechaNacimiento
+      - fechaNac
       oneOf:
       - required: ["correo"]
       - required: ["numeroCelular"]

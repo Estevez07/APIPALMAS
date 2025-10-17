@@ -91,14 +91,15 @@ saveTokenUser(otp,existente,LocalDateTime.now().plusMinutes(10),TokenTipo.VERIFI
 saveTokenUser(otp,usuarioGuardado,LocalDateTime.now().plusMinutes(10),TokenTipo.VERIFICACION);
 
         correoService.sendOtpEmail(usuarioGuardado.getCorreo(), otp);
+
+        return "¡Registro exitoso! Por favor, verifique su correo electrónico.";
     } else {
-        usuario.setVerified(true);
+        usuarioGuardado.setVerified(true);
         usuarioRepository.save(usuarioGuardado);
     }
 
-     usuarioRepository.save(usuario);
+    return "¡Registro exitoso!";
 
-        return "¡Registro exitoso! Por favor, verifique su correo electrónico.";
     }
 
     @Override

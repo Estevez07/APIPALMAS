@@ -1,5 +1,6 @@
 package com.laspalmas.api.exception;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,13 +20,17 @@ import jakarta.validation.ConstraintViolationException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<String> handleUsernameNotFound(UsernameNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("El usuario o contraseña son incorrectos");
+    public ResponseEntity<Map<String, String>> handleUsernameNotFound(UsernameNotFoundException ex) {
+         Map<String, String> response = new HashMap<>();
+         response.put("error", "El usuario o contraseña son incorrectos");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentials(BadCredentialsException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("El usuario o contraseña son incorrectos");
+    public ResponseEntity<Map<String, String>>  handleBadCredentials(BadCredentialsException ex) {
+        Map<String, String> response = new HashMap<>();
+         response.put("error", "El usuario o contraseña son incorrectos");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     // Para validaciones de @Valid en @RequestBody
