@@ -13,7 +13,11 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
    
-  Optional<Usuario> findByCorreoOrNumeroCelular(String correo, String numeroCelular);
+   @Query("SELECT u FROM Usuario u WHERE " +
+           "(:correo IS NOT NULL AND u.correo = :correo) OR " +
+           "(:numeroCelular IS NOT NULL AND u.numeroCelular = :numeroCelular)")
+    Optional<Usuario> findByCorreoOrNumeroCelular(@Param("correo") String correo,
+                                                  @Param("numeroCelular") String numeroCelular);
     
 
   @Query("SELECT u FROM Usuario u WHERE (u.correo = :credencial OR u.numeroCelular = :credencial) AND u.isVerified = true")

@@ -1,5 +1,6 @@
 package com.laspalmas.api.exception;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -66,10 +67,11 @@ public ResponseEntity<?> handleHttpMessageNotReadable(HttpMessageNotReadableExce
     // Para cualquier otro error de parseo JSON
     return ResponseEntity.badRequest().body("Error de lectura del JSON: " + ex.getMessage());
 }
-    
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGeneralError(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error inesperado: " + ex.getMessage());
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntime(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(Map.of("error", ex.getMessage()));
     }
   
 }

@@ -49,7 +49,7 @@ public SecurityFilterChain filterChain(HttpSecurity http, JwtFilter jwtFilter,
         })
     )    
             .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**", "/oauth2/**", "/login/**").permitAll()
+            .requestMatchers("/auth/**", "/oauth2/**", "/login/**","/swagger-ui/**","/v3/**").permitAll()
             .anyRequest().authenticated()
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

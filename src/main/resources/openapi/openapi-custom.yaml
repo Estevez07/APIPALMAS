@@ -1,0 +1,417 @@
+openapi: 3.0.3
+info:
+  title: Las Palmas API
+  version: "1.0.0"
+  description: >
+    Documentación de la API **Las Palmas**.
+    Incluye autenticación por correo o número celular, mensajería,
+    gestión de pedidos y verificación de usuarios mediante OTP EMAIL.
+
+servers:
+  - url: http://localhost:8080
+    description: Servidor local de desarrollo
+
+tags:
+  - name: Autenticación
+    description: Registro, inicio de sesión y recuperación de contraseña.
+  - name: Autenticación externa
+    description: autenticación mediante google o facebook,no hace falta verificarlos.
+  - name: Verificación
+    description: Verificación de OTP para registro o restablecimiento de contraseña.
+  - name: Pedidos
+    description: Creación y gestión de pedidos.
+  - name: Mensajes
+    description: Envío, modificación, visualización y eliminación de mensajes.
+  - name: Usuarios
+    description: Consultas de usuarios.
+
+paths:
+  /auth/register:
+    post:
+      tags: [Autenticación]
+      summary: Registrar un nuevo usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Usuario'
+      responses:
+        '201':
+          description: Usuario registrado correctamente
+        '400':
+          description: Error en los datos enviados
+
+  /auth/login:
+    post:
+      tags: [Autenticación]
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Inicio de sesión exitoso, devuelve token JWT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciales inválidas
+
+  /auth/forgot_password:
+    post:
+      tags: [Autenticación]
+      summary: Solicitar recuperación de contraseña por correo electrónico
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                correo:
+                  type: string
+                  example: usuario@ejemplo.com
+      responses:
+        '201':
+          description: OTP enviado al correo
+        '404':
+          description: Usuario no encontrado
+
+  /auth/verify/register:
+    post:
+      tags: [Verificación]
+      summary: Verificar OTP para completar el registro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificacionOTP'
+      responses:
+        '201':
+          description: Verificación exitosa
+
+  /auth/verify/forgot_password:
+    post:
+      tags: [Verificación]
+      summary: Verificar OTP para restablecer contraseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificacionOTPPassword'
+      responses:
+        '201':
+          description: Contraseña restablecida
+
+  /pedidos:
+    get:
+      tags: [Pedidos]
+      summary: Obtener todos los pedidos (solo ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de pedidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PedidoDTO'
+    post:
+      tags: [Pedidos]
+      summary: Crear un nuevo pedido (usuario autenticado)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Pedido creado correctamente
+
+  /pedidos/{id}:
+    put:
+      tags: [Pedidos]
+      summary: Modificar pedido (usuario autenticado)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                archivos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: Pedido modificado correctamente
+    delete:
+      tags: [Pedidos]
+      summary: Eliminar pedido (solo ADMIN)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Pedido eliminado
+
+  /mensajes/enviar:
+    post:
+      tags: [Mensajes]
+      summary: Enviar mensaje entre usuarios
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                contenido:
+                  type: string
+                idDestinatario:
+                  type: integer
+                archivos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                idPedido:
+                  type: integer
+      responses:
+        '201':
+          description: Mensaje enviado exitosamente
+
+  /mensajes/entre:
+    get:
+      tags: [Mensajes]
+      summary: Obtener mensajes entre dos usuarios
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: idDestinatario
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de mensajes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MensajeDTO'
+
+  /usuarios/con-pedidos:
+    get:
+      tags: [Usuarios]
+      summary: Obtener usuarios con sus pedidos
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios con pedidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioDTO'
+
+  /oauth2/authorization/facebook:
+    get:
+      x-hidden: true
+      tags: [Autenticación externa]
+      summary: Iniciar sesión con Facebook
+      description: >
+        Redirige al usuario al inicio de sesión de **Facebook OAuth2**.
+        Una vez autorizado, Facebook redirige a `/login/oauth2/code/facebook`.
+        Este endpoint no devuelve JSON ni puede probarse desde Swagger UI.
+      responses:
+        '302':
+          description: Redirección al flujo de autenticación de Facebook
+          headers:
+            Location:
+              description: URL del formulario de login de Facebook
+              schema:
+                type: string
+                example: https://www.facebook.com/v18.0/dialog/oauth?client_id=...
+
+  /oauth2/authorization/google:
+    get:
+      x-hidden: true
+      tags: [Autenticación externa]
+      summary: Iniciar sesión con Google
+      description: >
+        Redirige al usuario al inicio de sesión de **Google OAuth2**.
+        Una vez autorizado, Google redirige a `/login/oauth2/code/google`.
+        Este endpoint no devuelve JSON ni puede probarse desde Swagger UI.
+      responses:
+        '302':
+          description: Redirección al flujo de autenticación de Google
+          headers:
+            Location:
+              description: URL del formulario de login de Google
+              schema:
+                type: string
+                example: https://accounts.google.com/o/oauth2/v2/auth?client_id=...
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        nombre:
+          type: string
+          example: Luis
+        apellidos:
+          type: string
+          example: Estevez  
+        correo:
+          type: string
+          example: luis@gmail.com
+        numeroCelular:
+          type: string
+          example: "1234567891"
+        contraseña:
+          type: string
+          example: "claveSegura123"
+        fechaNacimiento:
+          format: date
+          example: "2002-09-07"
+      required:
+      - nombre
+      - apellidos
+      - contraseña
+      - fechaNacimiento
+      oneOf:
+      - required: ["correo"]
+      - required: ["numeroCelular"]
+
+    LoginRequest:
+      type: object
+      properties:
+        correo:
+          type: string
+          example: usuario@ejemplo.com
+        numeroCelular:
+          type: string
+          example: "5551234567"
+        contraseña:
+          type: string
+          example: "123456"
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9...
+
+    VerificacionOTP:
+      type: object
+      properties:
+        correo:
+          type: string
+        tokens:
+          type: array
+          items:
+            type: object
+            properties:
+              token:
+                type: string
+                example: "123456"
+
+    VerificacionOTPPassword:
+      allOf:
+        - $ref: '#/components/schemas/VerificacionOTP'
+        - type: object
+          properties:
+            contraseña:
+              type: string
+              example: "newPassword123"
+
+    PedidoDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        fecha:
+          type: string
+          format: date-time
+        archivos:
+          type: array
+          items:
+            type: string
+        usuario:
+          type: string
+
+    MensajeDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        contenido:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        remitente:
+          type: string
+        destinatario:
+          type: string
+
+    UsuarioDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        nombre:
+          type: string
+        correo:
+          type: string
+        pedidos:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedidoDTO'
