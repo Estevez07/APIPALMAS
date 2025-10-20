@@ -4,6 +4,7 @@ import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.dto.PedidoDTO;
 import com.laspalmas.api.service.PedidoService;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,7 @@ public class PedidoController {
 
     //  USER autenticado
     @PostMapping
-    public ResponseEntity<PedidoDTO> agregarPedido(@RequestParam("archivos") List<MultipartFile> archivos,
+    public ResponseEntity<PedidoDTO> agregarPedido(@Parameter(hidden = true) @RequestParam("archivos") List<MultipartFile> archivos,
                                                    @AuthenticationPrincipal User usuarioAutenticado) throws IOException {
         String credencial = usuarioAutenticado.getUsername();
         return ResponseEntity.status(HttpStatus.CREATED).body(pedidoService.agregarPedido(archivos, credencial));
@@ -51,11 +52,11 @@ public class PedidoController {
         return ResponseEntity.noContent().build();
     }
 
-
+    // Usuario autenticado
     @PutMapping(ApiPaths.PEDIDOS_ID)
     public ResponseEntity<PedidoDTO> modificarPedido(
             @PathVariable Long idPedido,
-            @RequestParam(required = false) List<MultipartFile> archivos,
+            @Parameter(hidden = true) @RequestParam(required = false) List<MultipartFile> archivos,
             @AuthenticationPrincipal User usuarioAutenticado
     ) throws IOException {
        

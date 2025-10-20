@@ -99,7 +99,7 @@ public class MensajeServiceImpl implements MensajeService{
 
 @Override
  @PreAuthorize(Authorization.OWNER)
-public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String credencial) {
+ public MensajeDTO modificarMensaje(Long id, String nuevoContenido,List<MultipartFile> archivos, String credencial) {
     Mensaje mensaje = mensajeRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Mensaje no encontrado"));
 
@@ -109,6 +109,12 @@ public MensajeDTO modificarMensaje(Long id, String nuevoContenido, String creden
             throw new SecurityException("No tienes permisos para modificar este mensaje");
         }
 
+        Optional.ofNullable(archivos)
+        .filter(list -> !list.isEmpty())
+        .map(list -> list.stream()
+                         .map(archivoMapper::toEntity)
+                         .toList())
+        .ifPresent(mensaje::setArchivos);
 
     mensaje.setContenido(nuevoContenido);
     Mensaje actualizado = mensajeRepository.save(mensaje);

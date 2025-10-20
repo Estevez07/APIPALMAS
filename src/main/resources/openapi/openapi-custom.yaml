@@ -74,16 +74,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                correo:
-                  type: string
-                  example: usuario@ejemplo.com
+             $ref: '#/components/schemas/OTPRequest'
       responses:
         '201':
           description: OTP enviado al correo
-        '404':
-          description: Usuario no encontrado
+        '400':
+          description: >
+           Usuario no encontrado. 
+           Usuario no verificado
 
   /auth/verify/register:
     post:
@@ -118,6 +116,12 @@ paths:
       responses:
         '201':
           description: Contraseña restablecida
+        '400':
+          description: |
+           Usuario no encontrado.
+           No existe un codigo de recuperación activo.
+           Código expirado.
+           Código incorrecto.  
 
   /pedidos:
     get:
@@ -134,9 +138,14 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PedidoDTO'
+        '400':
+          description: Acceso denegado, no tiene permisos
     post:
       tags: [Pedidos]
       summary: Crear un nuevo pedido (usuario autenticado)
+      description: |
+        Permite a un usuario autenticado crear un nuevo pedido.
+        Los archivos se envían como parte del cuerpo **multipart/form-data**.
       security:
         - bearerAuth: []
       requestBody:
@@ -151,9 +160,43 @@ paths:
                   items:
                     type: string
                     format: binary
+              required:
+               - archivos
       responses:
         '201':
           description: Pedido creado correctamente
+          content:
+           application/json:
+             schema:
+               $ref: '#/components/schemas/PedidoDTO'
+        '400':
+          description: Error en la creación del pedido
+        '401':
+          description: No autorizado (token inválido o ausente)
+          
+  /pedidos/{credencial}:
+    get:
+      tags: [Pedidos]
+      summary: Obtener todos los pedidos de un usuario especifico (ADMIN o el mismo usuario autenticado)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: credencial
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Pedidos obtenidos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PedidoDTO'
+        '400':
+          description: Acceso denegado, no tiene permisos
 
   /pedidos/{id}:
     put:
@@ -182,6 +225,8 @@ paths:
       responses:
         '200':
           description: Pedido modificado correctamente
+        '401':
+          description: No autorizado (token inválido o ausente)
     delete:
       tags: [Pedidos]
       summary: Eliminar pedido (solo ADMIN)
@@ -196,6 +241,8 @@ paths:
       responses:
         '204':
           description: Pedido eliminado
+        '401':
+          description: No autorizado (token inválido o ausente)
 
   /mensajes/enviar:
     post:
@@ -221,9 +268,15 @@ paths:
                     format: binary
                 idPedido:
                   type: integer
+              required:
+               - contenido
+               - idDestinatario
+      
       responses:
         '201':
           description: Mensaje enviado exitosamente
+        '401':
+          description: No autorizado (token inválido o ausente)
 
   /mensajes/entre:
     get:
@@ -246,11 +299,98 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MensajeDTO'
+        '401':
+          description: No autorizado (token inválido o ausente)
+  /mensajes/{id}:
+    put:
+      tags: [Mensajes]
+      summary: Actualizar el contenido de un mensaje
+      description: Permite modificar el contenido de un mensaje existente mediante su ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del mensaje que se desea actualizar.
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+       content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              archivos:
+                type: array
+                items:
+                  type: string
+                  format: binary
+        application/json:   
+          schema:
+            type: object
+            properties:
+              nuevoContenido:
+                type: string
+                description: Nuevo contenido del mensaje     
+                example: bla bla bla bla bla ....
+            required:
+              - nuevoContenido
+
+      responses:
+        '200':
+          description: Contenido actualizado correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: "Contenido actualizado correctamente"
+        '400':
+          description: Solicitud inválida.
+        '401':
+          description: No autorizado (token inválido o ausente)
+        '404':
+          description: Mensaje no encontrado.
+
+    delete:
+      tags: [Mensajes]
+      summary: Eliminar un mensaje
+      description: Elimina un mensaje existente mediante su ID.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identificador del mensaje a eliminar.
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Mensaje eliminado correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: "Mensaje eliminado correctamente"
+        '401':
+          description: No autorizado (token inválido o ausente)
+        '404':
+          description: Mensaje no encontrado.
+
 
   /usuarios/con-pedidos:
     get:
       tags: [Usuarios]
-      summary: Obtener usuarios con sus pedidos
+      summary: Obtener usuarios con sus pedidos (Solo ADMIN)
       security:
         - bearerAuth: []
       responses:
@@ -261,8 +401,11 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UsuarioDTO'
-
+                  $ref: '#/components/schemas/PedidoDTO'
+        '400':
+          description: Acceso Denegado
+        '401':
+          description: No autorizado (token inválido o ausente)
   /oauth2/authorization/facebook:
     get:
       x-hidden: true
@@ -300,6 +443,26 @@ paths:
               schema:
                 type: string
                 example: https://accounts.google.com/o/oauth2/v2/auth?client_id=...
+
+  /login/failed:
+    get:
+      x-hidden: true
+      tags: [Autenticación externa]
+      summary: Endpoint que indica fallo en el inicio de sesión
+      description: >
+        Este endpoint devuelve un **400 Bad Request** cuando falla el inicio de sesión.
+        Está oculto en la documentación de Swagger.
+      responses:
+        '400':
+          description: Inicio de sesión fallido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mensaje:
+                    type: string
+                    example: "Inicio de sesión fallido"              
 components:
   securitySchemes:
     bearerAuth:
@@ -319,10 +482,12 @@ components:
           example: Estevez  
         correo:
           type: string
-          example: luis@gmail.com
+          example: usuario@ejemplo.com
+          description: "Correo electrónico (requerido si no se envía númeroCelular)"
         numeroCelular:
           type: string
           example: "1234567891"
+          description: "Número de celular (requerido si no se envía correo)"
         contraseña:
           type: string
           example: "claveSegura123"
@@ -344,33 +509,58 @@ components:
         correo:
           type: string
           example: usuario@ejemplo.com
+          description: "Correo electrónico (requerido si no se envía númeroCelular)"
         numeroCelular:
           type: string
           example: "5551234567"
+          description: "Número de celular (requerido si no se envía correo)"
         contraseña:
           type: string
-          example: "123456"
+          example: "claveSegura123"
+      required:
+      - contraseña
+      oneOf:
+      - required: ["correo"]
+      - required: ["numeroCelular"]
 
     AuthResponse:
       type: object
       properties:
         token:
           type: string
-          example: eyJhbGciOiJIUzI1NiJ9...
+          example: Bearer eyJhbGciOiJIUzI1NiJ9...
+        rol:
+          type: string
+          example: ROL_USER
+          
+    OTPRequest:
+      type: object
+      properties:
+        correo:
+          type: string
+          example: usuario@ejemplo.com
+      required : 
+      - correo
 
     VerificacionOTP:
       type: object
       properties:
         correo:
           type: string
+          example: usuario@ejemplo.com
         tokens:
           type: array
           items:
             type: object
+            required:
+            - token
             properties:
               token:
                 type: string
                 example: "123456"
+      required:
+      - correo
+      - tokens
 
     VerificacionOTPPassword:
       allOf:
@@ -380,6 +570,8 @@ components:
             contraseña:
               type: string
               example: "newPassword123"
+          required:
+          - contraseña
 
     PedidoDTO:
       type: object
@@ -392,35 +584,83 @@ components:
         archivos:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/ArchivoDTO'
         usuario:
-          type: string
+          type: array
+          items: 
+            $ref: '#/components/schemas/UsuarioDTO'
+
+      required:
+       - id
+       - fecha
+       - archivos
+       - usuario
 
     MensajeDTO:
       type: object
       properties:
         id:
-          type: integer
+         type: integer
+         format: int64
+         description: ID del mensaje
         contenido:
-          type: string
-        fecha:
-          type: string
-          format: date-time
+         type: string
+        description: Contenido del mensaje
+        fechaEnvio:
+         type: string
+         format: date-time
+         description: Fecha y hora en que se envió el mensaje
+        estado:
+         type: string
+         description: Estado del mensaje (por ejemplo. ENVIADO, LEÍDO, etc.)
         remitente:
-          type: string
+         $ref: '#/components/schemas/UsuarioDTO'
         destinatario:
-          type: string
+         $ref: '#/components/schemas/UsuarioDTO'
+        archivos:
+         type: array
+         description: Lista de archivos adjuntos (opcional)
+         items:
+          $ref: '#/components/schemas/ArchivoDTO'
+        pedido:
+         $ref: '#/components/schemas/PedidoDTO'
+      required:
+      - contenido
+      - remitente
+      - destinatario
+      - estado
+      - fechaEnvio
 
     UsuarioDTO:
       type: object
       properties:
-        id:
-          type: integer
         nombre:
           type: string
+          example: name
+        apellidos:
+          type: string
+          example: lastname
+        numeroCelular:
+          type: string
+          example: "5544332211"
         correo:
           type: string
-        pedidos:
-          type: array
-          items:
-            $ref: '#/components/schemas/PedidoDTO'
+          format: email
+          example: usuario@gmail.com
+        fechaNac:
+         format: date
+         example: "2002-09-07"
+
+    ArchivoDTO:
+      type: object
+      properties:
+        nombre:
+          type: string
+          example: imagen1.png
+        tipo:
+          type: string
+          example: image/png
+        base64:
+          type: string
+          description: Contenido del archivo en base64
+          example: iVBORw0KGgoAAAANSUhEUgAA...

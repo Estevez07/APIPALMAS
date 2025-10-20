@@ -140,9 +140,9 @@ saveTokenUser(otp,user,LocalDateTime.now().plusMinutes(10),TokenTipo.RESET);
          
              correoService.sendForgotPasswordEmail(user.getCorreo(), otp);
         }else {
-             throw new RuntimeException("El usuario no existe");
+             throw new RuntimeException("El usuario no esta verificado");
         }
-             return "Verifica un correo para poder recuperar tu contraseña";
+             return "Verifica tu correo para poder recuperar tu contraseña";
 }
   
 

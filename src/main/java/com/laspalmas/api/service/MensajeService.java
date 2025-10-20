@@ -16,6 +16,6 @@ public interface MensajeService {
                                 Long idPedido) throws IOException;
 
      List<MensajeDTO> obtenerMensajesEntreUsuarios(String credencial, Long idDestinatario);
-     MensajeDTO modificarMensaje(Long id, String nuevoContenido, String credencial);
+     MensajeDTO modificarMensaje(Long id, String nuevoContenido,List<MultipartFile> archivos, String credencial);
      void eliminarMensaje(Long id, String credencial);
 }

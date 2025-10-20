@@ -3,6 +3,8 @@ package com.laspalmas.api.controller;
 import com.laspalmas.api.constant.ApiPaths;
 import com.laspalmas.api.dto.MensajeDTO;
 import com.laspalmas.api.service.MensajeService;
+
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -26,11 +28,11 @@ public class MensajeController {
     // Endpoint para enviar un mensaje
     @PostMapping(ApiPaths.MENSAJES_ENVIAR)
     public ResponseEntity<MensajeDTO> enviarMensaje(
-            @RequestParam String contenido,
-            @RequestParam(required = false) List<MultipartFile> archivos,
-            @RequestParam Long idDestinatario,
-            @AuthenticationPrincipal User usuarioAutenticado,
-            @RequestParam(required = false) Long idPedido
+          @Parameter(hidden = true)  @RequestParam String contenido,
+          @Parameter(hidden = true)  @RequestParam(required = false) List<MultipartFile> archivos,
+          @Parameter(hidden = true) @RequestParam Long idDestinatario,
+          @Parameter(hidden = true) @AuthenticationPrincipal User usuarioAutenticado,
+          @Parameter(hidden = true)  @RequestParam(required = false) Long idPedido
     ) throws IOException {
 
 
@@ -54,16 +56,17 @@ public class MensajeController {
     }
 
 
-// Modificar mensaje (agregar un mapper si es que vienen archivos nuevos........---------------------)
+// Modificar mensaje 
     @PutMapping(ApiPaths.MENSAJES_ID)
     public ResponseEntity<?> modificarMensaje(
             @PathVariable Long id,
-            @RequestParam String nuevoContenido,
+            @Parameter(hidden = true)  @RequestParam String nuevoContenido,
+            @Parameter(hidden = true)  @RequestParam(required = false) List<MultipartFile> archivos,
             @AuthenticationPrincipal User usuarioAutenticado
     ) {
        
             String credencial = usuarioAutenticado.getUsername();
-            MensajeDTO actualizado = mensajeService.modificarMensaje(id, nuevoContenido, credencial);
+            MensajeDTO actualizado = mensajeService.modificarMensaje(id, nuevoContenido, archivos , credencial);
             return ResponseEntity.ok(actualizado); // 200 OK
         
     }
